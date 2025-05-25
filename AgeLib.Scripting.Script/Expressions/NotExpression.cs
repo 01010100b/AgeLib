@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per.Expressions;
+namespace AgeLib.Scripting.Script.Expressions;
 
 public class NotExpression(FactExpression expression) : FactExpression
 {
     public override int CommandCount => 1 + Expression.CommandCount;
     public FactExpression Expression { get; set; } = expression;
+
+    public override IEnumerable<Command> GetCommands() => Expression.GetCommands();
 
     public override string Format(int spaces = 4)
     {

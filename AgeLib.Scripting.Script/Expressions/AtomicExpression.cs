@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per.Expressions;
+namespace AgeLib.Scripting.Script.Expressions;
 
 public class AtomicExpression(Command command) : FactExpression
 {
     public override int CommandCount => 1;
     public Command Command { get; set; } = command;
+
+    public override IEnumerable<Command> GetCommands() => [Command];
 
     public override string Format(int spaces = 4)
     {

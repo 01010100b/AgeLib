@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per;
+namespace AgeLib.Scripting.Script;
 
 public abstract class FactExpression
 {
     public abstract int CommandCount { get; }
+
+    public abstract IEnumerable<Command> GetCommands();
 
     public abstract string Format(int spaces = 4);
 

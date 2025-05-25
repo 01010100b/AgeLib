@@ -1,7 +1,5 @@
-﻿using AgeLib.Scripting.Per;
-using AgeLib.Scripting.Per.Expressions;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using AgeLib.Scripting.Script;
+using AgeLib.Scripting.Script.Expressions;
 
 namespace ConsoleApp1
 {

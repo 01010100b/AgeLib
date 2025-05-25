@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per;
+namespace AgeLib.Scripting.Script;
 
 public class Rule
 {
@@ -14,6 +14,7 @@ public class Rule
     public List<Command> Actions { get; } = [];
 
     public int CommandCount => Math.Max(1, Facts.Sum(x => x.CommandCount)) + Math.Max(1, Actions.Count);
+    public IEnumerable<Command> Commands => Facts.SelectMany(x => x.GetCommands()).Concat(Actions);
     public bool IsAlwaysTrue => Facts.Count == 0;
     public bool IsJump => Actions.Any(x => x.Name.StartsWith("up-jump-"));
     public bool IsEmpty => Facts.Count == 0 && Actions.Count == 0;

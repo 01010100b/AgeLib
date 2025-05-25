@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per;
+namespace AgeLib.Scripting.Script;
 
-public class Script
+public class OldScript
 {
     public List<string> Comments { get; } = [];
     public List<string> Includes { get; } = [];

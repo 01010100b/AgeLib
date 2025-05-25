@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Per;
+namespace AgeLib.Scripting.Script;
 
 public class Command(string name, string arg0 = "", string arg1 = "", string arg2 = "", string arg3 = "")
 {
