@@ -8,10 +8,10 @@ namespace AgeLib.Scripting.Script;
 
 public class Rule
 {
-    public List<string> Comments { get; } = [];
-    public List<string> Labels { get; } = [];
-    public List<FactExpression> Facts { get; } = [];
-    public List<Command> Actions { get; } = [];
+    public List<string> Comments { get; set; } = [];
+    public List<string> Labels { get; set; } = [];
+    public List<FactExpression> Facts { get; set; } = [];
+    public List<Command> Actions { get; set; } = [];
 
     public int CommandCount => Math.Max(1, Facts.Sum(x => x.CommandCount)) + Math.Max(1, Actions.Count);
     public IEnumerable<Command> Commands => Facts.SelectMany(x => x.GetCommands()).Concat(Actions);

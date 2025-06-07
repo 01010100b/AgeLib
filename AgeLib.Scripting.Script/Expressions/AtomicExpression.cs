@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Script.Expressions;
 
-public class AtomicExpression(Command command) : FactExpression
+public class AtomicExpression : FactExpression
 {
+    public required Command Command { get; set; }
     public override int CommandCount => 1;
-    public Command Command { get; set; } = command;
 
     public override IEnumerable<Command> GetCommands() => [Command];
 

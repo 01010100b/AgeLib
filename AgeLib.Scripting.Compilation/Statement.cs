@@ -15,4 +15,11 @@ public abstract class Statement : Validated
     internal abstract List<Instruction> Compile(State state);
     internal abstract Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables);
     internal abstract IEnumerable<Variable> GetVariables();
+
+    internal sealed override void Validate(Resolver resolver)
+    {
+        ValidateStatement(resolver);
+    }
+
+    protected private abstract void ValidateStatement(Resolver resolver);
 }

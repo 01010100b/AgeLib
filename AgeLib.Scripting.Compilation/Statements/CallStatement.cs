@@ -12,7 +12,7 @@ public class CallStatement : Statement
 {
     public Variable? Result { get; set; }
     public required string MethodName { get; set; }
-    public List<Variable> Arguments { get; } = [];
+    public required List<Variable> Arguments { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
@@ -29,7 +29,7 @@ public class CallStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override void Validate(Resolver resolver)
+    protected private override void ValidateStatement(Resolver resolver)
     {
         throw new NotImplementedException();
     }

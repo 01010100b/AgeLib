@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Compilation.Statements;
 
-public class DereferenceStatement : Statement
+public class SetFieldStatement : Statement
 {
-    public required Variable Result { get; set; }
     public required Variable Variable { get; set; }
+    public required List<string> Accessors { get; set; }
+    public required Variable Value { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
@@ -28,7 +29,7 @@ public class DereferenceStatement : Statement
         throw new NotImplementedException();
     }
 
-    protected private override void ValidateStatement(Resolver resolver)
+    private protected override void ValidateStatement(Resolver resolver)
     {
         throw new NotImplementedException();
     }

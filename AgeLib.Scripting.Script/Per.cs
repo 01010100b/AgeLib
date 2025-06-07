@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Script;
 
-public class OldScript
+public class Per
 {
-    public List<string> Comments { get; } = [];
-    public List<string> Includes { get; } = [];
-    public Dictionary<string, int> Constants { get; } = [];
-    public List<string> Symbols { get; } = [];
-    public List<Rule> Rules { get; } = [];
+    public List<string> Comments { get; set; } = [];
+    public List<string> Includes { get; set; } = [];
+    public Dictionary<string, int> Constants { get; set; } = [];
+    public Dictionary<string, string> StringConstants { get; set; } = [];
+    public List<string> Symbols { get; set; } = [];
+    public List<Rule> Rules { get; set; } = [];
 
     public override string ToString()
     {
@@ -37,14 +38,36 @@ public class OldScript
             sb.AppendLine($"(defconst {constant.Key} {constant.Value})");
         }
 
+        foreach (var constant in StringConstants)
+        {
+            var cst = constant.Value;
+
+            if (cst == "")
+            {
+                continue;
+            }
+
+            if (!cst.StartsWith('"'))
+            {
+                cst = "\"" + cst;
+            }
+
+            if (!cst.EndsWith('"'))
+            {
+                cst += "\"";
+            }
+
+            sb.AppendLine($"(defconst {constant.Key} {cst})");
+        }
+
         sb.AppendLine();
 
         foreach (var symbol in Symbols)
         {
             sb.AppendLine($"#load-if-defined {symbol}");
-            sb.AppendLine($"(defconst SYM-{symbol} 1)");
+            sb.AppendLine($"    (defconst SYM-{symbol} 1)");
             sb.AppendLine("#else");
-            sb.AppendLine($"(defconst SYM-{symbol} 0)");
+            sb.AppendLine($"    (defconst SYM-{symbol} 0)");
             sb.AppendLine("#end-if");
             sb.AppendLine();
         }

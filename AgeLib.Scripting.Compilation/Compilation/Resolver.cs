@@ -26,20 +26,27 @@ internal class Resolver
     public IEnumerable<Module> ResolvedModules => Modules.Values;
 
     private Dictionary<string, Module> Modules { get; } = [];
+    private Dictionary<string, PointerType> PointerTypes { get; } = [];
+    private Dictionary<string, ArrayType> ArrayTypes { get; } = [];
 
     public Resolver(Module main_module, List<Func<string, Module?>> resolvers)
     {
-        var system_module = new Module()
-        {
-            Name = "System",
-            GlobalScope = new()
-        };
-
+        var system_module = new Module() { Name = "System" };
         system_module.Types.Add(new PrimitiveType() { Name = "System.Void", TypeSize = 0 });
         system_module.Types.Add(new PrimitiveType() { Name = "System.Int", TypeSize = 1 });
         system_module.Types.Add(new PrimitiveType() { Name = "System.Bool", TypeSize = 1 });
+        system_module.Types.Add(new CompoundType()
+            {
+                Name = "System.Point",
+                Fields =
+                [
+                    new() { Name = "X", TypeName = "System.Int"},
+                    new() { Name = "Y", TypeName = "System.Int"}
+                ]
+            });
 
         Modules.Add("System", system_module);
+
         Modules.Add(main_module.Name, main_module);
         var stack = new Stack<string>();
         
@@ -90,7 +97,14 @@ internal class Resolver
             var typename = name[..^1];
             Validated.ValidateName(typename);
 
-            throw new NotImplementedException();
+            if (!PointerTypes.TryGetValue(name, out var type))
+            {
+                type = new() { Name = name, PointedType = ResolveType(typename) };
+                type.Validate(this);
+                PointerTypes.Add(name, type);
+            }
+
+            return type;
         }
         else if (name.EndsWith("[]"))
         {
@@ -98,7 +112,14 @@ internal class Resolver
             var typename = name[..^2];
             Validated.ValidateName(typename);
 
-            throw new NotImplementedException();
+            if (!ArrayTypes.TryGetValue(name, out var type))
+            {
+                type = new() { Name = name, ElementType = ResolveType(typename) };
+                type.Validate(this);
+                ArrayTypes.Add(name, type);
+            }
+
+            return type;
         }
         else
         {

@@ -10,7 +10,7 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class LabelStatement : Statement
 {
-    public string Label { get; } = Guid.NewGuid().ToString();
+    internal string Label { get; } = Guid.NewGuid().ToString();
 
     internal override List<Instruction> Compile(State state)
     {
@@ -27,7 +27,7 @@ public class LabelStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override void Validate(Resolver resolver)
+    protected private override void ValidateStatement(Resolver resolver)
     {
         throw new NotImplementedException();
     }

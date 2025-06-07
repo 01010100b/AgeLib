@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Script.Expressions;
 
-public class OrExpression(FactExpression left, FactExpression right) : FactExpression
+public class OrExpression : FactExpression
 {
+    public required FactExpression Left { get; set; }
+    public required FactExpression Right { get; set; }
     public override int CommandCount => 1 + Left.CommandCount + Right.CommandCount;
-    public FactExpression Left { get; set; } = left;
-    public FactExpression Right { get; set; } = right;
 
     public override IEnumerable<Command> GetCommands() => Left.GetCommands().Concat(Right.GetCommands());
 

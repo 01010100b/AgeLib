@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Compilation.Types;
 
-internal class PrimitiveType : Type
+internal class ArrayType : Type
 {
-    public required int TypeSize { get; set; }
-    public override int Size => TypeSize;
+    public required Type ElementType { get; set; }
+    public override int Size => 1;
 
     internal override void Validate(Resolver resolver)
     {

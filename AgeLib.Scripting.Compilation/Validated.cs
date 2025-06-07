@@ -10,24 +10,24 @@ namespace AgeLib.Scripting.Compilation;
 
 public abstract class Validated
 {
+    public static void ValidateName(string name)
+    {
+        // module & method & type
+        var regex = "^[a-zA-Z]+(.[a-zA-Z]+)*$";
+
+        if (!Regex.IsMatch(name, regex))
+        {
+            throw new Exception($"{name} is not a valid name");
+        }
+    }
+
     public static void ValidateVariableName(string name)
     {
         var regex = "^[_a-zA-Z][_a-zA-Z0-9]*$";
         
         if (!Regex.IsMatch(name, regex))
         {
-            throw new ArgumentException($"{name} is not a valid variable name");
-        }
-    }
-
-    public static void ValidateName(string name)
-    {
-        // module, type, method
-        var regex = "^[a-zA-Z]+(.[a-zA-Z]+)*$";
-
-        if (!Regex.IsMatch (name, regex))
-        {
-            throw new ArgumentException($"{name} is not a valid name");
+            throw new Exception($"{name} is not a valid variable name");
         }
     }
 

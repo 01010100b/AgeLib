@@ -27,7 +27,7 @@ public class ThrowStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override void Validate(Resolver resolver)
+    protected private override void ValidateStatement(Resolver resolver)
     {
         throw new NotImplementedException();
     }

@@ -7,17 +7,44 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Compilation;
 
-public class Scope
+public class Scope : Validated
 {
     public Scope? Parent { get; set; }
-    public List<Variable> Variables { get; } = [];
+    public List<Variable> Variables { get; set; } = [];
 
-    internal int GetSize(Resolver resolver)
+    internal IEnumerable<Variable> GetVariablesInScope()
     {
-        throw new NotImplementedException();
+        var current = this;
+
+        while (current is not null)
+        {
+            foreach (var variable in current.Variables)
+            {
+                yield return variable;
+            }
+
+            current = current.Parent;
+        }
     }
 
+    internal int GetSize(Resolver resolver)
+        => Variables.Where(x => x is not Constant).Sum(x => resolver.ResolveType(x.TypeName).Size);
+
     internal int GetLocalSize(Resolver resolver)
+    {
+        var size = 0;
+        var current = this;
+
+        while (current.Parent is not null)
+        {
+            size += current.GetSize(resolver);
+            current = current.Parent;
+        }
+
+        return size;
+    }
+
+    internal override void Validate(Resolver resolver)
     {
         throw new NotImplementedException();
     }

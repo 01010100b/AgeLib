@@ -10,10 +10,10 @@ namespace AgeLib.Scripting.Compilation;
 public class Module : Validated
 {
     public required string Name { get; set; }
-    public List<string> Imports { get; } = [];
-    public List<Type> Types { get; } = [];
-    public List<Method> Methods { get; } = [];
-    public required Scope GlobalScope { get; set; }
+    public List<string> Imports { get; set; } = [];
+    public List<Type> Types { get; set; } = [];
+    public List<Method> Methods { get; set; } = [];
+    public Scope Scope { get; set; } = new();
 
     internal override void Validate(Resolver resolver)
     {

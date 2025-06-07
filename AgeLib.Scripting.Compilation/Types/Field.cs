@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Compilation.Types;
 
-internal class PrimitiveType : Type
+public class Field : Validated
 {
-    public required int TypeSize { get; set; }
-    public override int Size => TypeSize;
+    public required string Name { get; set; }
+    public required string TypeName { get; set; }
 
     internal override void Validate(Resolver resolver)
     {

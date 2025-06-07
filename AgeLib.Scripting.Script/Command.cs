@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace AgeLib.Scripting.Script;
 
-public class Command(string name, string arg0 = "", string arg1 = "", string arg2 = "", string arg3 = "")
+public class Command
 {
-    public string Name { get; set; } = name;
-    public string Arg0 { get; set; } = arg0;
-    public string Arg1 { get; set; } = arg1;
-    public string Arg2 { get; set; } = arg2;
-    public string Arg3 { get; set; } = arg3;
+    public required string Name { get; set; }
+    public string Arg0 { get; set; } = "";
+    public string Arg1 { get; set; } = "";
+    public string Arg2 { get; set; } = "";
+    public string Arg3 { get; set; } = "";
 
     public override string ToString() => $"{Name} {Arg0} {Arg1} {Arg2} {Arg3}".Trim();
 }

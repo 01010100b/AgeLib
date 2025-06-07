@@ -15,6 +15,19 @@ public class Constant : Variable
     {
         base.Validate(resolver);
 
-        throw new NotImplementedException();
+        if (TypeName != "System.Int")
+        {
+            if (TypeName == "System.Bool")
+            {
+                if (Value != 0 && Value != 1)
+                {
+                    throw new Exception($"Bool constant is not 0 or 1");
+                }
+            }
+            else
+            {
+                throw new Exception($"Constant is not int or bool");
+            }
+        }
     }
 }

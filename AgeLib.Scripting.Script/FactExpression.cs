@@ -11,7 +11,6 @@ public abstract class FactExpression
     public abstract int CommandCount { get; }
 
     public abstract IEnumerable<Command> GetCommands();
-
     public abstract string Format(int spaces = 4);
 
     protected string FormatOp(string op, int spaces, FactExpression first, FactExpression second)
