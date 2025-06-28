@@ -10,7 +10,7 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class JumpConditionalStatement : Statement
 {
-    public required Variable Condition { get; set; }
+    public required string Condition { get; set; }
     public required LabelStatement Label { get; set; }
 
     internal override List<Instruction> Compile(State state)
@@ -18,12 +18,12 @@ public class JumpConditionalStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<Variable> GetVariables()
+    internal override IEnumerable<string> GetVariables()
     {
         throw new NotImplementedException();
     }

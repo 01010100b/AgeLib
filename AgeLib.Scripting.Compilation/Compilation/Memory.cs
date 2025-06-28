@@ -10,9 +10,9 @@ namespace AgeLib.Scripting.Compilation.Compilation;
 
 internal class Memory
 {
-    public Memory(Resolver resolver, List<Module> modules)
+    public Memory(Resolver resolver)
     {
-        ComputeCompoundTypeSizes(resolver, modules);
+        ComputeCompoundTypeSizes(resolver);
     }
 
     public int GetAddress(Variable variable)
@@ -20,11 +20,11 @@ internal class Memory
         throw new NotImplementedException();
     }
 
-    private void ComputeCompoundTypeSizes(Resolver resolver, IEnumerable<Module> modules)
+    private void ComputeCompoundTypeSizes(Resolver resolver)
     {
         var compound_types = new List<CompoundType>();
 
-        foreach (var module in modules)
+        foreach (var module in resolver.ResolvedModules)
         {
             foreach (var type in module.Types.OfType<CompoundType>())
             {

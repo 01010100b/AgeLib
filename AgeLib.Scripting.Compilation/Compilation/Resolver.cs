@@ -9,20 +9,6 @@ namespace AgeLib.Scripting.Compilation.Compilation;
 
 internal class Resolver
 {
-    public static string GetModuleName(string name)
-    {
-        var index = name.LastIndexOf('.');
-
-        return name[..index];
-    }
-
-    public static string GetSimpleName(string name)
-    {
-        var index = name.LastIndexOf('.');
-
-        return name[(index + 1)..];
-    }
-
     public IEnumerable<Module> ResolvedModules => Modules.Values;
 
     private Dictionary<string, Module> Modules { get; } = [];
@@ -36,14 +22,14 @@ internal class Resolver
         system_module.Types.Add(new PrimitiveType() { Name = "System.Int", TypeSize = 1 });
         system_module.Types.Add(new PrimitiveType() { Name = "System.Bool", TypeSize = 1 });
         system_module.Types.Add(new CompoundType()
-            {
-                Name = "System.Point",
-                Fields =
-                [
-                    new() { Name = "X", TypeName = "System.Int"},
-                    new() { Name = "Y", TypeName = "System.Int"}
-                ]
-            });
+        {
+            Name = "System.Point",
+            Fields =
+            [
+                new() { Name = "X", TypeName = "System.Int"},
+                new() { Name = "Y", TypeName = "System.Int"}
+            ]
+        });
 
         Modules.Add("System", system_module);
 
@@ -91,15 +77,14 @@ internal class Resolver
 
     public Type ResolveType(string name)
     {
+        Validated.ValidateTypeName(name);
+
         if (name.EndsWith('*'))
         {
             // pointer
-            var typename = name[..^1];
-            Validated.ValidateName(typename);
-
             if (!PointerTypes.TryGetValue(name, out var type))
             {
-                type = new() { Name = name, PointedType = ResolveType(typename) };
+                type = new() { Name = name, PointedType = ResolveType(name[..^1]) };
                 type.Validate(this);
                 PointerTypes.Add(name, type);
             }
@@ -109,12 +94,9 @@ internal class Resolver
         else if (name.EndsWith("[]"))
         {
             // array
-            var typename = name[..^2];
-            Validated.ValidateName(typename);
-
             if (!ArrayTypes.TryGetValue(name, out var type))
             {
-                type = new() { Name = name, ElementType = ResolveType(typename) };
+                type = new() { Name = name, ElementType = ResolveType(name[..^2]) };
                 type.Validate(this);
                 ArrayTypes.Add(name, type);
             }
@@ -123,10 +105,27 @@ internal class Resolver
         }
         else
         {
-            return ResolveModule(GetModuleName(name)).Types.Single(x => x.Name == name);
+            return ResolveModule(Validated.GetModuleName(name)).Types.Single(x => x.Name == name);
         }
     }
 
     public Method ResolveMethod(string name)
-        => ResolveModule(GetModuleName(name)).Methods.Single(x => x.Name == name);
+        => ResolveModule(Validated.GetModuleName(name)).Methods.Single(x => x.Name == name);
+
+    public Variable ResolveVariable(string name, Method? method)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool IsExported(string name)
+    {
+        if (!name.Contains('.'))
+        {
+            return false;
+        }
+
+        var module = ResolveModule(Validated.GetModuleName(name));
+
+        return module.Exports.Contains(name);
+    }
 }

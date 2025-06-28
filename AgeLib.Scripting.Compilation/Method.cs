@@ -17,7 +17,7 @@ public class Method : Validated
 
     internal string Label { get; } = Guid.NewGuid().ToString();
 
-    internal IEnumerable<Scope> GetScopes 
+    internal IEnumerable<Scope> GetScopes() 
         => Statements.Select(x => x.Scope).Append(Scope).Distinct();
 
     internal override void Validate(Resolver resolver)

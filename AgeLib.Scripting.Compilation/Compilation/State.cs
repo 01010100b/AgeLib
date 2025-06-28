@@ -9,4 +9,5 @@ namespace AgeLib.Scripting.Compilation.Compilation;
 internal class State(Resolver resolver)
 {
     public Resolver Resolver { get; } = resolver;
+    public Memory Memory { get; } = new(resolver);
 }

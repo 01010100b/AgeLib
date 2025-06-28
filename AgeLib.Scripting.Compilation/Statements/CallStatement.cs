@@ -10,21 +10,21 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class CallStatement : Statement
 {
-    public Variable? Result { get; set; }
+    public string? Result { get; set; }
     public required string MethodName { get; set; }
-    public required List<Variable> Arguments { get; set; }
+    public required List<string> Arguments { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<Variable> GetVariables()
+    internal override IEnumerable<string> GetVariables()
     {
         throw new NotImplementedException();
     }

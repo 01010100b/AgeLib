@@ -10,20 +10,20 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class DereferenceStatement : Statement
 {
-    public required Variable Result { get; set; }
-    public required Variable Variable { get; set; }
+    public required string Result { get; set; }
+    public required string Variable { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<Variable> GetVariables()
+    internal override IEnumerable<string> GetVariables()
     {
         throw new NotImplementedException();
     }
