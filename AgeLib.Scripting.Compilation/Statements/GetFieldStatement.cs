@@ -10,8 +10,8 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class GetFieldStatement : Statement
 {
-    public required string Result { get; set; }
-    public required string Variable { get; set; }
+    public required Variable Result { get; set; }
+    public required Variable Variable { get; set; }
     public required List<string> Accessors { get; set; }
 
     internal override List<Instruction> Compile(State state)
@@ -19,12 +19,12 @@ public class GetFieldStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<string> GetVariables()
+    internal override IEnumerable<Variable> GetVariables()
     {
         throw new NotImplementedException();
     }

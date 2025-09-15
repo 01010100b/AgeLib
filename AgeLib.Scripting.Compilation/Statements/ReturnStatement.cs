@@ -10,19 +10,19 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class ReturnStatement : Statement
 {
-    public string? Result {  get; set; }
+    public Variable? Result {  get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<string> GetVariables()
+    internal override IEnumerable<Variable> GetVariables()
     {
         throw new NotImplementedException();
     }

@@ -31,7 +31,7 @@ public abstract class Validated
 
         if (!Regex.IsMatch(name, regex))
         {
-            throw new Exception($"{name} is not a valid name");
+            throw new Exception($"{name} is not a valid name.");
         }
     }
 
@@ -40,18 +40,7 @@ public abstract class Validated
 
     public static void ValidateTypeName(string name)
     {
-        if (name.EndsWith('*'))
-        {
-            // pointer
-            name = name[..^1];
-        }
-        else if (name.EndsWith("[]"))
-        {
-            // array
-            name = name[..^2];
-        }
-
-        ValidateModuleName(name);
+        ValidateModuleName(Type.GetBaseTypeName(name));
     }
 
     public static void ValidateVariableName(string name)
@@ -67,7 +56,7 @@ public abstract class Validated
         
         if (!Regex.IsMatch(name, regex))
         {
-            throw new Exception($"{name} is not a valid variable name");
+            throw new Exception($"{name} is not a valid variable name.");
         }
     }
 

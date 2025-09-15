@@ -17,12 +17,12 @@ public class LabelStatement : Statement
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<string> GetVariables()
+    internal override IEnumerable<Variable> GetVariables()
     {
         throw new NotImplementedException();
     }

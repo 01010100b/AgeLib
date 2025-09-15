@@ -21,8 +21,5 @@ public class Variable : Validated
 
         ValidateVariableName(Name);
         ValidateTypeName(TypeName);
-        resolver.ResolveType(TypeName);
-
-        throw new NotImplementedException();
     }
 }

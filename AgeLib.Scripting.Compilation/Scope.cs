@@ -12,6 +12,18 @@ public class Scope : Validated
     public Scope? Parent { get; set; }
     public List<Variable> Variables { get; set; } = [];
 
+    internal Scope GetGlobalScope()
+    {
+        var current = this;
+
+        while (current.Parent is not null)
+        {
+            current = current.Parent;
+        }
+
+        return current;
+    }
+
     internal IEnumerable<Variable> GetVariablesInScope()
     {
         var current = this;
@@ -46,6 +58,24 @@ public class Scope : Validated
 
     internal override void Validate(Resolver resolver)
     {
+        foreach (var variable in Variables)
+        {
+            variable.Validate(resolver);
+
+            if (!resolver.IsAccessible(variable.TypeName, this))
+            {
+                throw new Exception($"Type {variable.TypeName} is not accessible.");
+            }
+
+            foreach (var other in GetVariablesInScope().Except([variable]))
+            {
+                if (other.Name == variable.Name)
+                {
+                    throw new Exception($"A variable with name {variable.Name} already exists in scope.");
+                }
+            }
+        }
+
         throw new NotImplementedException();
     }
 }

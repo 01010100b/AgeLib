@@ -61,7 +61,7 @@ internal class Resolver
 
                 if (module is null)
                 {
-                    throw new Exception($"Failed to resolve module {name}");
+                    throw new Exception($"Failed to resolve module {name}.");
                 }
             }
 
@@ -79,24 +79,22 @@ internal class Resolver
     {
         Validated.ValidateTypeName(name);
 
-        if (name.EndsWith('*'))
+        if (Type.IsPointerType(name))
         {
-            // pointer
             if (!PointerTypes.TryGetValue(name, out var type))
             {
-                type = new() { Name = name, PointedType = ResolveType(name[..^1]) };
+                type = new() { Name = name, PointedType = ResolveType(Type.GetBaseTypeName(name)) };
                 type.Validate(this);
                 PointerTypes.Add(name, type);
             }
 
             return type;
         }
-        else if (name.EndsWith("[]"))
+        else if (Type.IsArrayType(name))
         {
-            // array
             if (!ArrayTypes.TryGetValue(name, out var type))
             {
-                type = new() { Name = name, ElementType = ResolveType(name[..^2]) };
+                type = new() { Name = name, ElementType = ResolveType(Type.GetBaseTypeName(name)) };
                 type.Validate(this);
                 ArrayTypes.Add(name, type);
             }
@@ -112,20 +110,53 @@ internal class Resolver
     public Method ResolveMethod(string name)
         => ResolveModule(Validated.GetModuleName(name)).Methods.Single(x => x.Name == name);
 
-    public Variable ResolveVariable(string name, Method? method)
+    public bool IsAccessible(string name, Scope scope)
     {
-        throw new NotImplementedException();
-    }
+        var module = ResolvedModules.Single(x => x.GlobalScope == scope.GetGlobalScope());
 
-    public bool IsExported(string name)
-    {
-        if (!name.Contains('.'))
+        if (Type.IsPointerType(name) || Type.IsArrayType(name))
         {
-            return false;
+            name = Type.GetBaseTypeName(name);
         }
 
-        var module = ResolveModule(Validated.GetModuleName(name));
+        if (module.Types.Select(x => x.Name).Concat(module.Methods.Select(x => x.Name)).Contains(name))
+        {
+            return true;
+        }
 
-        return module.Exports.Contains(name);
+        if (GetAllImports(module).SelectMany(x => x.Exports).Contains(name))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private IEnumerable<Module> GetAllImports(Module module)
+    {
+        var set = new HashSet<string>();
+        var queue = new Queue<string>();
+        queue.Enqueue("System");
+
+        foreach (var import in module.Imports)
+        {
+            queue.Enqueue(import);
+        }
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+            set.Add(current);
+
+            foreach (var import in ResolveModule(current).Imports)
+            {
+                if (!set.Contains(import))
+                {
+                    queue.Enqueue(import);
+                }
+            }
+        }
+
+        return set.Select(ResolveModule);
     }
 }
