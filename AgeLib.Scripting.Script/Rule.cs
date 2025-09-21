@@ -32,7 +32,7 @@ public class Rule
 
         if (Facts.Count == 0)
         {
-            sb.AppendLine("\t(true)");
+            sb.AppendLine("    (true)");
         }
         else
         {

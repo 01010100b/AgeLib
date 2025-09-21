@@ -9,16 +9,11 @@ namespace AgeLib.Scripting.Compilation;
 
 public abstract class Type : Validated
 {
-    public static bool IsPointerType(string type_name) => type_name.EndsWith('*');
     public static bool IsArrayType(string type_name) => type_name.EndsWith("[]");
 
     public static string GetBaseTypeName(string type_name)
     {
-        if (IsPointerType(type_name))
-        {
-            return type_name[..^1];
-        }
-        else if (IsArrayType(type_name))
+        if (IsArrayType(type_name))
         {
             return type_name[..^2];
         }

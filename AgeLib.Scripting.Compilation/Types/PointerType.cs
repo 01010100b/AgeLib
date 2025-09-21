@@ -9,7 +9,7 @@ namespace AgeLib.Scripting.Compilation.Types;
 
 internal class PointerType : Type
 {
-    public required Type PointedType { get; set; }
+    public required Type PointedType { get; init; }
     public override int Size => 1;
 
     internal override void Validate(Resolver resolver)

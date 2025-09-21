@@ -12,7 +12,6 @@ internal class Resolver
     public IEnumerable<Module> ResolvedModules => Modules.Values;
 
     private Dictionary<string, Module> Modules { get; } = [];
-    private Dictionary<string, PointerType> PointerTypes { get; } = [];
     private Dictionary<string, ArrayType> ArrayTypes { get; } = [];
 
     public Resolver(Module main_module, List<Func<string, Module?>> resolvers)
@@ -79,18 +78,7 @@ internal class Resolver
     {
         Validated.ValidateTypeName(name);
 
-        if (Type.IsPointerType(name))
-        {
-            if (!PointerTypes.TryGetValue(name, out var type))
-            {
-                type = new() { Name = name, PointedType = ResolveType(Type.GetBaseTypeName(name)) };
-                type.Validate(this);
-                PointerTypes.Add(name, type);
-            }
-
-            return type;
-        }
-        else if (Type.IsArrayType(name))
+        if (Type.IsArrayType(name))
         {
             if (!ArrayTypes.TryGetValue(name, out var type))
             {
@@ -114,7 +102,7 @@ internal class Resolver
     {
         var module = ResolvedModules.Single(x => x.GlobalScope == scope.GetGlobalScope());
 
-        if (Type.IsPointerType(name) || Type.IsArrayType(name))
+        if (Type.IsArrayType(name))
         {
             name = Type.GetBaseTypeName(name);
         }

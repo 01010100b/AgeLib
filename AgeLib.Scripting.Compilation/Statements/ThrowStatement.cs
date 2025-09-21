@@ -1,4 +1,5 @@
 ﻿using AgeLib.Scripting.Assembly;
+using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Compilation.Compilation;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,25 @@ public class ThrowStatement : Statement
 
     internal override List<Instruction> Compile(State state)
     {
-        throw new NotImplementedException();
+        var instructions = new List<Instruction>
+        {
+            new CommandInstruction()
+            {
+                Command = new()
+                {
+                    Name = "up-modify-goal",
+                    Arg0 = state.Memory.ExceptionCode.ToString(),
+                    Arg1 = "c:=",
+                    Arg2 = state.Exceptions[Message].ToString()
+                }
+            },
+            new JumpInstruction()
+            {
+                Label = state.ExceptionLabel
+            }
+        };
+
+        return instructions;
     }
 
     internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
@@ -29,6 +48,9 @@ public class ThrowStatement : Statement
 
     protected private override void ValidateStatement(Resolver resolver)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(Message))
+        {
+            throw new ValidationException($"Message is empty");
+        }
     }
 }

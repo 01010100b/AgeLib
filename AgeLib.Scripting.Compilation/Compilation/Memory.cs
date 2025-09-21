@@ -3,22 +3,67 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace AgeLib.Scripting.Compilation.Compilation;
 
 internal class Memory
 {
+    public int MaxGoals { get; } = 1;
+    public int ExceptionCode { get; } = 2;
+    public int Sp0 { get; } = 10;
+    public int Sp1 { get; } = 11;
+    public int Sp2 { get; } = 12;
+    public int Sp3 { get; } = 13;
+    public int Sp4 { get; } = 14;
+    public int StackBasePtr { get; } = 30;
+    public int StackPtr { get; } = 31;
+    public int RegisterBase { get; } = 50;
+    public int RegisterCount { get; }
+    public int ReturnAddress => RegisterBase;
+    public int FramePtr => ReturnAddress + 1;
+    public int UnwindCount => FramePtr + 1;
+    public int ReturnValueBase => RegisterBase + RegisterCount;
+    public int ReturnValueCount { get; }
+    public int GlobalVariablesBase => ReturnValueBase + ReturnValueCount;
+    public int GlobalVariablesCount { get; }
+    public int InitialStackBase => GlobalVariablesBase + GlobalVariablesCount;
+
+    private Dictionary<Variable, int> Addresses { get; } = [];
+
     public Memory(Resolver resolver)
     {
         ComputeCompoundTypeSizes(resolver);
+
+        int get_register_size(Method method)
+        {
+            var max = 0;
+
+            foreach (var scope in method.GetScopes())
+            {
+                var current = scope;
+                var size = 0;
+
+                while (current.Parent is not null)
+                {
+                    size += scope.GetSize(resolver);
+                    current = current.Parent;
+                }
+
+                max = Math.Max(max, size);
+            }
+
+            return max;
+        }
+
+        RegisterCount = 3 + resolver.ResolvedModules.SelectMany(x => x.Methods).Max(get_register_size);
+        ReturnValueCount = resolver.ResolvedModules.SelectMany(x => x.Methods).Max(x => resolver.ResolveType(x.ReturnTypeName).Size);
+        GlobalVariablesCount = ComputeVariableAddresses(resolver);
     }
 
-    public int GetAddress(Variable variable)
-    {
-        throw new NotImplementedException();
-    }
+    public int GetAddress(Variable variable) => Addresses[variable];
 
     private void ComputeCompoundTypeSizes(Resolver resolver)
     {
@@ -50,5 +95,47 @@ internal class Memory
 
             count = compound_types.Count;
         }
+    }
+
+    private int ComputeVariableAddresses(Resolver resolver)
+    {
+        int get_offset(Scope scope)
+        {
+            var offset = 0;
+
+            while (scope.Parent is not null)
+            {
+                scope = scope.Parent;
+                offset += scope.GetSize(resolver);
+            }
+
+            return offset;
+        }
+
+        foreach (var scope in resolver.ResolvedModules
+            .SelectMany(x => x.Methods)
+            .SelectMany(x => x.GetScopes()))
+        {
+            var offset = RegisterBase + 3 + get_offset(scope);
+
+            foreach (var variable in scope.Variables.Where(x => x is not Constant))
+            {
+                Addresses.Add(variable, offset);
+                offset += resolver.ResolveType(variable.TypeName).Size;
+            }
+        }
+
+        var global = 0;
+
+        foreach (var scope in resolver.ResolvedModules.Select(x => x.GlobalScope))
+        {
+            foreach (var variable in scope.Variables.Where(x => x is not Constant))
+            {
+                Addresses.Add(variable, GlobalVariablesBase + global);
+                global += resolver.ResolveType(variable.TypeName).Size;
+            }
+        }
+
+        return global;
     }
 }

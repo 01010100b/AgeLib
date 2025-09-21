@@ -9,7 +9,7 @@ namespace AgeLib.Scripting.Compilation;
 
 public class Scope : Validated
 {
-    public Scope? Parent { get; set; }
+    public Scope? Parent { get; set; } = null;
     public List<Variable> Variables { get; set; } = [];
 
     internal Scope GetGlobalScope()
@@ -41,20 +41,6 @@ public class Scope : Validated
 
     internal int GetSize(Resolver resolver)
         => Variables.Where(x => x is not Constant).Sum(x => resolver.ResolveType(x.TypeName).Size);
-
-    internal int GetLocalSize(Resolver resolver)
-    {
-        var size = 0;
-        var current = this;
-
-        while (current.Parent is not null)
-        {
-            size += current.GetSize(resolver);
-            current = current.Parent;
-        }
-
-        return size;
-    }
 
     internal override void Validate(Resolver resolver)
     {
