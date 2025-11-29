@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="BinaryLibs.Utils" Version="0.110.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>

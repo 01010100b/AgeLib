@@ -15,7 +15,24 @@ public class ReturnStatement : Statement
 
     internal override List<Instruction> Compile(State state)
     {
-        throw new NotImplementedException();
+        var instructions = new List<Instruction>();
+
+        if (ResultVariable is not null)
+        {
+            var variable = state.Resolver.ResolveVariable(ResultVariable, Scope);
+            var size = state.Resolver.ResolveType(variable.TypeName).Size;
+            var from = state.Memory.GetAddress(variable);
+            var to = state.Memory.ReturnValueBase;
+
+            instructions.AddRange(state.Copy(from, false, to, false, size, false));
+        }
+
+        instructions.Add(new JumpInstruction() 
+        { 
+            Label = state.MethodPostfixLabels[state.Resolver.ResolveMethod(this)] 
+        });
+
+        return instructions;
     }
 
     internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)

@@ -3,7 +3,6 @@ using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Compilation.Compilation;
 using AgeLib.Scripting.Script;
 using AgeLib.Scripting.Script.Expressions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +31,6 @@ public class Compiler
         }
 
         instructions.AddRange(GetPostFix(state));
-
-        Console.WriteLine(JsonConvert.SerializeObject(instructions, Formatting.Indented));
 
         return instructions;
     }
@@ -142,6 +139,7 @@ public class Compiler
         });
 
         // TODO add module initializer methods
+        // TODO check if all global arrays have been initialized
 
         instructions.Add(new CommandInstruction()
         {
@@ -204,8 +202,54 @@ public class Compiler
 
         // unwind stack
 
-        instructions.Add(new LabelInstruction() { Label = state.UnwindStackLabel });
+        instructions.AddRange(
+        [
+            new LabelInstruction() { Label = state.UnwindStackLabel },
+            new CommandInstruction()
+            {
+                Command = new()
+                {
+                    Name = "up-modify-goal",
+                    Arg0 = state.Memory.StackPtr.ToString(),
+                    Arg1 = "g:=",
+                    Arg2 = state.Memory.FramePtr.ToString()
+                }
+            },
+            new CommandInstruction()
+            {
+                Command = new()
+                {
+                    Name = "up-modify-goal",
+                    Arg0 = state.Memory.StackPtr.ToString(),
+                    Arg1 = "g:-",
+                    Arg2 = state.Memory.UnwindCount.ToString()
+                }
+            },
+            new CommandInstruction()
+            {
+                Command = new()
+                {
+                    Name = "up-modify-goal",
+                    Arg0 = state.Memory.Intr0.ToString(),
+                    Arg1 = "g:=",
+                    Arg2 = state.Memory.ReturnAddress.ToString()
+                }
+            },
+            new CommandInstruction()
+            {
+                Command = new()
+                {
+                    Name = "up-modify-goal",
+                    Arg0 = state.Memory.Intr1.ToString(),
+                    Arg1 = "g:=",
+                    Arg2 = state.Memory.UnwindCount.ToString()
+                }
+            }
+        ]);
 
+        instructions.AddRange(state.Clear(state.Memory.RegisterBase, false, state.Memory.RegisterCount, false));
+        instructions.AddRange(state.Copy(state.Memory.StackPtr, true, state.Memory.RegisterBase, false, state.Memory.Intr1, true));
+        instructions.Add(new JumpIndirectInstruction() { Goal = state.Memory.Intr0 });
 
         // exceptions
 
@@ -234,6 +278,12 @@ public class Compiler
                     {
                         Name = "chat-to-all",
                         Arg0 = $"\"ERROR: {exception.Key}\""
+                    },
+                    new Command()
+                    {
+                        Name = "up-jump-direct",
+                        Arg0 = "c:",
+                        Arg1 = "100000"
                     }
                 ]
             });

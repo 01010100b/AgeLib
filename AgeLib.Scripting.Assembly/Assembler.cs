@@ -1,6 +1,7 @@
 ﻿using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Script;
 using AgeLib.Scripting.Script.Expressions;
+using BinaryLibs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,9 @@ public class Assembler
 
         foreach (var instruction in instructions)
         {
-            if (rule.CommandCount >= MaxCommandsPerRule)
+            Assert.That(rule.CommandCount <= MaxCommandsPerRule);
+
+            if (rule.CommandCount == MaxCommandsPerRule)
             {
                 per.Rules.Add(rule);
                 rule = new();
@@ -31,8 +34,8 @@ public class Assembler
                 per.Rules.Add(rule);
                 rule = new()
                 {
-                    Facts = ri.Facts.ToList(),
-                    Actions = ri.Actions.ToList()
+                    Facts = [.. ri.Facts],
+                    Actions = [.. ri.Actions]
                 };
 
                 per.Rules.Add(rule);

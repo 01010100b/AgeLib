@@ -23,6 +23,8 @@ internal class MethodCompiler
             state.MethodPostfixLabels.Add(method, Guid.NewGuid().ToString());
         }
 
+        instructions.Add(new LabelInstruction() { Label = method.Label });
+
         foreach (var statement in method.Statements)
         {
             instructions.AddRange(statement.Compile(state));

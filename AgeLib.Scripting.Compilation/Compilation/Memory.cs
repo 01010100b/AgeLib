@@ -12,6 +12,8 @@ namespace AgeLib.Scripting.Compilation.Compilation;
 
 internal class Memory
 {
+    public const int EXTRA_REGISTERS = 3;
+
     public int MaxGoals { get; } = 1;
     public int ExceptionCode { get; } = 2;
     public int Sp0 { get; } = 10;
@@ -24,6 +26,16 @@ internal class Memory
     public int Sp7 { get; } = 17;
     public int Sp8 { get; } = 18;
     public int Sp9 { get; } = 19;
+    public int Intr0 { get; } = 20;
+    public int Intr1 { get; } = 21;
+    public int Intr2 { get; } = 22;
+    public int Intr3 { get; } = 23;
+    public int Intr4 { get; } = 24;
+    public int Intr5 { get; } = 25;
+    public int Intr6 { get; } = 26;
+    public int Intr7 { get; } = 27;
+    public int Intr8 { get; } = 28;
+    public int Intr9 { get; } = 29;
     public int StackBasePtr { get; } = 30;
     public int StackPtr { get; } = 31;
     public int RegisterBase { get; } = 50;
@@ -58,7 +70,7 @@ internal class Memory
             return max;
         }
 
-        RegisterCount = 3 + resolver.ResolvedModules.SelectMany(x => x.Methods).Max(get_register_size);
+        RegisterCount = EXTRA_REGISTERS + resolver.ResolvedModules.SelectMany(x => x.Methods).Max(get_register_size);
         ReturnValueCount = resolver.ResolvedModules.SelectMany(x => x.Methods).Max(x => resolver.ResolveType(x.ReturnTypeName).Size);
         GlobalVariablesCount = ComputeVariableAddresses(resolver);
     }
@@ -107,7 +119,7 @@ internal class Memory
                 .Except(scope.Variables)
                 .Where(x => x is not Constant)
                 .Sum(x => resolver.ResolveType(x.TypeName).Size);
-            offset += RegisterBase + 3;
+            offset += RegisterBase + EXTRA_REGISTERS;
 
             foreach (var variable in scope.Variables.Where(x => x is not Constant))
             {
