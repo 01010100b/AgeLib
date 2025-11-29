@@ -160,6 +160,8 @@ public class Compiler
             Label = state.ExceptionLabel
         });
 
+        instructions.AddRange(state.Clear(state.Memory.RegisterBase, false, state.Memory.RegisterCount, false));
+
         instructions.Add(new CommandInstruction()
         {
             Command = new()
@@ -278,12 +280,6 @@ public class Compiler
                     {
                         Name = "chat-to-all",
                         Arg0 = $"\"ERROR: {exception.Key}\""
-                    },
-                    new Command()
-                    {
-                        Name = "up-jump-direct",
-                        Arg0 = "c:",
-                        Arg1 = "100000"
                     }
                 ]
             });

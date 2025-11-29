@@ -54,28 +54,27 @@ internal class Memory
     public Memory(Resolver resolver)
     {
         ComputeCompoundTypeSizes(resolver);
-
-        int get_register_size(Method method)
-        {
-            var max = 0;
-
-            foreach (var scope in method.GetScopes())
-            {
-                var size = scope.GetLocalsInScope()
-                    .Where(x => x is not Constant)
-                    .Sum(x => resolver.ResolveType(x.TypeName).Size);
-                max = Math.Max(max, size);
-            }
-
-            return max;
-        }
-
-        RegisterCount = EXTRA_REGISTERS + resolver.ResolvedModules.SelectMany(x => x.Methods).Max(get_register_size);
+        RegisterCount = EXTRA_REGISTERS + resolver.ResolvedModules.SelectMany(x => x.Methods).Max(x => GetRegistersSize(x, resolver));
         ReturnValueCount = resolver.ResolvedModules.SelectMany(x => x.Methods).Max(x => resolver.ResolveType(x.ReturnTypeName).Size);
         GlobalVariablesCount = ComputeVariableAddresses(resolver);
     }
 
     public int GetAddress(Variable variable) => Addresses[variable];
+
+    public int GetRegistersSize(Method method, Resolver resolver)
+    {
+        var max = 0;
+
+        foreach (var scope in method.GetScopes())
+        {
+            var size = scope.GetLocalsInScope()
+                .Where(x => x is not Constant)
+                .Sum(x => resolver.ResolveType(x.TypeName).Size);
+            max = Math.Max(max, size);
+        }
+
+        return max;
+    }
 
     private void ComputeCompoundTypeSizes(Resolver resolver)
     {

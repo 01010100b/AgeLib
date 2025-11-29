@@ -14,7 +14,7 @@ public class Assembler
 {
     public int MaxCommandsPerRule { get; set; } = 32;
 
-    public Per Assemble(IEnumerable<Instruction> instructions)
+    public Per Assemble(List<Instruction> instructions)
     {
         var per = new Per();
         var rule = new Rule();

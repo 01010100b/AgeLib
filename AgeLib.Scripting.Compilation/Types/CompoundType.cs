@@ -14,6 +14,37 @@ public class CompoundType : Type
 
     private int ComputedSize { get; set; } = 0;
 
+    internal int GetOffset(IEnumerable<string> accessors, Resolver resolver)
+    {
+        var lst = accessors.ToList();
+        var offset = 0;
+
+        foreach (var field in Fields)
+        {
+            if (field.Name != lst[0])
+            {
+                offset += resolver.ResolveType(field.TypeName).Size;
+            }
+            else
+            {
+                lst.RemoveAt(0);
+
+                if (lst.Count == 0)
+                {
+                    return offset;
+                }
+                else
+                {
+                    var type = (CompoundType)resolver.ResolveType(field.TypeName);
+
+                    return offset + type.GetOffset(lst, resolver);
+                }
+            }
+        }
+
+        throw new Exception();
+    }
+
     internal void ComputeSize(Resolver resolver)
     {
         var size = 0;
