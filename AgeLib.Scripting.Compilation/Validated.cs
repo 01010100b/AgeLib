@@ -11,6 +11,10 @@ namespace AgeLib.Scripting.Compilation;
 
 public abstract class Validated
 {
+    private class ValidationException(string message) : Exception(message)
+    {
+    }
+
     public static string GetModuleName(string name)
     {
         var index = name.LastIndexOf('.');
@@ -31,7 +35,7 @@ public abstract class Validated
 
         if (!Regex.IsMatch(name, regex))
         {
-            throw new Exception($"{name} is not a valid name.");
+            throw new ValidationException($"{name} is not a valid name.");
         }
     }
 
@@ -39,9 +43,7 @@ public abstract class Validated
         => ValidateModuleName(name);
 
     public static void ValidateTypeName(string name)
-    {
-        ValidateModuleName(Type.GetBaseTypeName(name));
-    }
+        => ValidateModuleName(Type.GetBaseTypeName(name));
 
     public static void ValidateVariableName(string name)
     {
@@ -56,9 +58,22 @@ public abstract class Validated
         
         if (!Regex.IsMatch(name, regex))
         {
-            throw new Exception($"{name} is not a valid variable name.");
+            throw new ValidationException($"{name} is not a valid variable name.");
         }
     }
 
     internal abstract void Validate(Resolver resolver);
+
+    protected void ThrowIf(bool condition, string message)
+    {
+        if (condition)
+        {
+            Throw(message);
+        }
+    }
+
+    protected void Throw(string message)
+    {
+        throw new ValidationException(message);
+    }
 }

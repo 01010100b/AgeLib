@@ -1,4 +1,5 @@
 ﻿using AgeLib.Scripting.Assembly;
+using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Compilation.Compilation;
 using System;
 using System.Collections.Generic;
@@ -10,19 +11,19 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class ReturnStatement : Statement
 {
-    public Variable? Result {  get; set; }
+    public string? ResultVariable { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
         throw new NotImplementedException();
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<Variable> GetVariables()
+    internal override IEnumerable<string> GetVariables()
     {
         throw new NotImplementedException();
     }

@@ -1,4 +1,5 @@
-﻿using AgeLib.Scripting.Compilation.Statements;
+﻿using AgeLib.Scripting.Assembly;
+using AgeLib.Scripting.Compilation.Statements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ internal class State
     public Memory Memory { get; }
     public IReadOnlyDictionary<string, int> Exceptions { get; }
     public string ExceptionLabel { get; } = Guid.NewGuid().ToString();
+    public string UnwindStackLabel { get; } = Guid.NewGuid().ToString();
+    public Dictionary<Method, string> MethodPostfixLabels { get; } = [];
 
     public State(Resolver resolver)
     {
@@ -37,5 +40,15 @@ internal class State
         }
 
         Exceptions = exceptions;
+    }
+
+    public List<Instruction> Clear(int from, bool is_from_ref, int length, bool is_length_goal)
+    {
+        throw new NotImplementedException();
+    }
+
+    public List<Instruction> Copy(int from, bool is_from_ref, int to, bool is_to_ref, int length, bool is_length_goal)
+    {
+        throw new NotImplementedException();
     }
 }

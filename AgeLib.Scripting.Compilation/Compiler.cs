@@ -3,6 +3,7 @@ using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Compilation.Compilation;
 using AgeLib.Scripting.Script;
 using AgeLib.Scripting.Script.Expressions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ public class Compiler
 
     public List<Instruction> Compile(Module module, string main_method, IEnumerable<Func<string, Module?>> resolvers)
     {
-        var resolver = new Resolver(module, resolvers.ToList());
+        var resolver = new Resolver(module, [.. resolvers]);
         var state = new State(resolver);
         var instructions = new List<Instruction>();
 
@@ -31,6 +32,8 @@ public class Compiler
         }
 
         instructions.AddRange(GetPostFix(state));
+
+        Console.WriteLine(JsonConvert.SerializeObject(instructions, Formatting.Indented));
 
         return instructions;
     }
@@ -74,6 +77,17 @@ public class Compiler
         {
             Goal = state.Memory.MaxGoals,
             Label = label_postinit
+        });
+
+        instructions.Add(new CommandInstruction()
+        {
+            Command = new()
+            {
+                Name = "up-modify-goal",
+                Arg0 = state.Memory.MaxGoals.ToString(),
+                Arg1 = "c:=",
+                Arg2 = "1"
+            }
         });
 
         instructions.Add(new RuleInstruction()
@@ -187,6 +201,13 @@ public class Compiler
     private List<Instruction> GetPostFix(State state)
     {
         var instructions = new List<Instruction>();
+
+        // unwind stack
+
+        instructions.Add(new LabelInstruction() { Label = state.UnwindStackLabel });
+
+
+        // exceptions
 
         instructions.Add(new LabelInstruction() { Label = state.ExceptionLabel });
         

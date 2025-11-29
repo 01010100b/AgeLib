@@ -10,16 +10,6 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        var module = TestModule.Create();
-        var compiler = new Compiler();
-        var instructions = compiler.Compile(module, "Test.Main", []);
 
-        var json = JsonConvert.SerializeObject(instructions, Formatting.Indented);
-        //Console.WriteLine(json);
-
-        var assembler = new Assembler();
-        var per = assembler.Assemble(instructions);
-
-        Console.WriteLine(per.ToString());
     }
 }

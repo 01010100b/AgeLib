@@ -13,8 +13,8 @@ public abstract class Statement : Validated
     public required Scope Scope { get; set; }
 
     internal abstract List<Instruction> Compile(State state);
-    internal abstract Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables);
-    internal abstract IEnumerable<Variable> GetVariables();
+    internal abstract Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables);
+    internal abstract IEnumerable<string> GetVariables();
 
     internal sealed override void Validate(Resolver resolver)
     {

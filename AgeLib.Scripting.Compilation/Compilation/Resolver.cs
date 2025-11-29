@@ -1,4 +1,5 @@
-﻿using AgeLib.Scripting.Compilation.Types;
+﻿using AgeLib.Scripting.Compilation.Statements;
+using AgeLib.Scripting.Compilation.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,21 +17,7 @@ internal class Resolver
 
     public Resolver(Module main_module, List<Func<string, Module?>> resolvers)
     {
-        var system_module = new Module() { Name = "System" };
-        system_module.Types.Add(new PrimitiveType() { Name = "System.Void", TypeSize = 0 });
-        system_module.Types.Add(new PrimitiveType() { Name = "System.Int", TypeSize = 1 });
-        system_module.Types.Add(new PrimitiveType() { Name = "System.Bool", TypeSize = 1 });
-        system_module.Types.Add(new CompoundType()
-        {
-            Name = "System.Point",
-            Fields =
-            [
-                new() { Name = "X", TypeName = "System.Int"},
-                new() { Name = "Y", TypeName = "System.Int"}
-            ]
-        });
-
-        Modules.Add("System", system_module);
+        Modules.Add("System", GenerateSystemModule());
 
         Modules.Add(main_module.Name, main_module);
         var stack = new Stack<string>();
@@ -69,10 +56,22 @@ internal class Resolver
                 stack.Push(import);
             }
         }
+
+        foreach (var method in ResolvedModules.SelectMany(x => x.Methods).Where(x => x.ReturnTypeName == "System.Void"))
+        {
+            if (method.Statements[^1] is not ReturnStatement)
+            {
+                method.Statements.Add(new ReturnStatement() { Scope = method.Scope });
+            }
+        }
     }
 
     public Module ResolveModule(string name)
-        => Modules[name];
+    {
+        Validated.ValidateModuleName(name);
+
+        return Modules[name];
+    }
 
     public Type ResolveType(string name)
     {
@@ -98,8 +97,21 @@ internal class Resolver
     public Method ResolveMethod(string name)
         => ResolveModule(Validated.GetModuleName(name)).Methods.Single(x => x.Name == name);
 
+    public Method ResolveMethod(Statement statement)
+        => ResolvedModules.SelectMany(x => x.Methods).Single(x => x.Statements.Contains(statement));
+
+    public Variable ResolveVariable(string name, Scope? scope)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool IsAccessible(string name, Scope scope)
     {
+        if (scope.GetLocalsInScope().Select(x => x.Name).Contains(name))
+        {
+            return true;
+        }
+
         var module = ResolvedModules.Single(x => x.GlobalScope == scope.GetGlobalScope());
 
         if (Type.IsArrayType(name))
@@ -107,7 +119,10 @@ internal class Resolver
             name = Type.GetBaseTypeName(name);
         }
 
-        if (module.Types.Select(x => x.Name).Concat(module.Methods.Select(x => x.Name)).Contains(name))
+        if (module.Types.Select(x => x.Name)
+            .Concat(module.Methods.Select(x => x.Name))
+            .Concat(module.GlobalScope.Variables.Select(x => x.Name))
+            .Contains(name))
         {
             return true;
         }
@@ -146,5 +161,24 @@ internal class Resolver
         }
 
         return set.Select(ResolveModule);
+    }
+
+    private Module GenerateSystemModule()
+    {
+        var system_module = new Module() { Name = "System" };
+        system_module.Types.Add(new PrimitiveType() { Name = "System.Void", TypeSize = 0 });
+        system_module.Types.Add(new PrimitiveType() { Name = "System.Int", TypeSize = 1 });
+        system_module.Types.Add(new PrimitiveType() { Name = "System.Bool", TypeSize = 1 });
+        system_module.Types.Add(new CompoundType()
+        {
+            Name = "System.Point",
+            Fields =
+            [
+                new() { Name = "X", TypeName = "System.Int"},
+                new() { Name = "Y", TypeName = "System.Int"}
+            ]
+        });
+
+        return system_module;
     }
 }

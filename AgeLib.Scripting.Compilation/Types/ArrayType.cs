@@ -10,7 +10,7 @@ namespace AgeLib.Scripting.Compilation.Types;
 internal class ArrayType : Type
 {
     public required Type ElementType { get; init; }
-    public override int Size => 1;
+    public override int Size => 2;
 
     internal override void Validate(Resolver resolver)
     {

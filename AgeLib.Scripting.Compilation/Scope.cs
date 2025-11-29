@@ -24,11 +24,11 @@ public class Scope : Validated
         return current;
     }
 
-    internal IEnumerable<Variable> GetVariablesInScope()
+    internal IEnumerable<Variable> GetLocalsInScope()
     {
         var current = this;
 
-        while (current is not null)
+        while (current.Parent is not null)
         {
             foreach (var variable in current.Variables)
             {
@@ -44,24 +44,6 @@ public class Scope : Validated
 
     internal override void Validate(Resolver resolver)
     {
-        foreach (var variable in Variables)
-        {
-            variable.Validate(resolver);
-
-            if (!resolver.IsAccessible(variable.TypeName, this))
-            {
-                throw new Exception($"Type {variable.TypeName} is not accessible.");
-            }
-
-            foreach (var other in GetVariablesInScope().Except([variable]))
-            {
-                if (other.Name == variable.Name)
-                {
-                    throw new Exception($"A variable with name {variable.Name} already exists in scope.");
-                }
-            }
-        }
-
         throw new NotImplementedException();
     }
 }

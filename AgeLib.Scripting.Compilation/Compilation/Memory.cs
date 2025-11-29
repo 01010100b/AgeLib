@@ -1,4 +1,5 @@
 ﻿using AgeLib.Scripting.Compilation.Types;
+using BinaryLibs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ internal class Memory
     public int Sp2 { get; } = 12;
     public int Sp3 { get; } = 13;
     public int Sp4 { get; } = 14;
+    public int Sp5 { get; } = 15;
+    public int Sp6 { get; } = 16;
+    public int Sp7 { get; } = 17;
+    public int Sp8 { get; } = 18;
+    public int Sp9 { get; } = 19;
     public int StackBasePtr { get; } = 30;
     public int StackPtr { get; } = 31;
     public int RegisterBase { get; } = 50;
@@ -43,15 +49,9 @@ internal class Memory
 
             foreach (var scope in method.GetScopes())
             {
-                var current = scope;
-                var size = 0;
-
-                while (current.Parent is not null)
-                {
-                    size += scope.GetSize(resolver);
-                    current = current.Parent;
-                }
-
+                var size = scope.GetLocalsInScope()
+                    .Where(x => x is not Constant)
+                    .Sum(x => resolver.ResolveType(x.TypeName).Size);
                 max = Math.Max(max, size);
             }
 
@@ -77,9 +77,9 @@ internal class Memory
             }
         }
 
-        var count = compound_types.Count;
+        var remaining = compound_types.Count;
 
-        while (count > 0)
+        while (remaining > 0)
         {
             foreach (var type in compound_types)
             {
@@ -88,35 +88,26 @@ internal class Memory
 
             compound_types.RemoveAll(x => x.Size > 0);
 
-            if (compound_types.Count == count)
+            if (compound_types.Count == remaining)
             {
                 throw new Exception($"Circular dependency between compound types:\n{string.Join('\n', compound_types.Select(x => x.Name))}");
             }
 
-            count = compound_types.Count;
+            remaining = compound_types.Count;
         }
     }
 
     private int ComputeVariableAddresses(Resolver resolver)
     {
-        int get_offset(Scope scope)
-        {
-            var offset = 0;
-
-            while (scope.Parent is not null)
-            {
-                scope = scope.Parent;
-                offset += scope.GetSize(resolver);
-            }
-
-            return offset;
-        }
-
         foreach (var scope in resolver.ResolvedModules
             .SelectMany(x => x.Methods)
             .SelectMany(x => x.GetScopes()))
         {
-            var offset = RegisterBase + 3 + get_offset(scope);
+            var offset = scope.GetLocalsInScope()
+                .Except(scope.Variables)
+                .Where(x => x is not Constant)
+                .Sum(x => resolver.ResolveType(x.TypeName).Size);
+            offset += RegisterBase + 3;
 
             foreach (var variable in scope.Variables.Where(x => x is not Constant))
             {

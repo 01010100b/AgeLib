@@ -36,21 +36,18 @@ public class ThrowStatement : Statement
         return instructions;
     }
 
-    internal override Statement Copy(Scope scope, IReadOnlyDictionary<Variable, Variable> variables)
+    internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
         throw new NotImplementedException();
     }
 
-    internal override IEnumerable<Variable> GetVariables()
+    internal override IEnumerable<string> GetVariables()
     {
         throw new NotImplementedException();
     }
 
     protected private override void ValidateStatement(Resolver resolver)
     {
-        if (string.IsNullOrWhiteSpace(Message))
-        {
-            throw new ValidationException($"Message is empty");
-        }
+        ThrowIf(string.IsNullOrWhiteSpace(Message), "Message is empty");
     }
 }

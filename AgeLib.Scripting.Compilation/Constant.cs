@@ -19,14 +19,11 @@ public class Constant : Variable
         {
             if (TypeName == "System.Bool")
             {
-                if (Value != 0 && Value != 1)
-                {
-                    throw new Exception($"Bool constant is not 0 or 1.");
-                }
+                ThrowIf(Value != 0 && Value != 1, $"Bool constant is not 0 or 1.");
             }
             else
             {
-                throw new Exception($"Constant is not int or bool.");
+                Throw($"Constant is not int or bool.");
             }
         }
     }
