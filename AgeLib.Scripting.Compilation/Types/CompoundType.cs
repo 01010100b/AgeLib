@@ -1,4 +1,5 @@
 ﻿using AgeLib.Scripting.Compilation.Compilation;
+using BinaryLibs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +15,19 @@ public class CompoundType : Type
 
     private int ComputedSize { get; set; } = 0;
 
-    internal int GetOffset(IEnumerable<string> accessors, Resolver resolver)
+    internal (Type, int) GetAccessor(IEnumerable<string> accessors, Resolver resolver)
     {
         var lst = accessors.ToList();
+        Assert.That(lst.Count > 0);
         var offset = 0;
 
         foreach (var field in Fields)
         {
+            var type = resolver.ResolveType(field.TypeName);
+
             if (field.Name != lst[0])
             {
-                offset += resolver.ResolveType(field.TypeName).Size;
+                offset += type.Size;
             }
             else
             {
@@ -31,18 +35,18 @@ public class CompoundType : Type
 
                 if (lst.Count == 0)
                 {
-                    return offset;
+                    return (type, offset);
                 }
                 else
                 {
-                    var type = (CompoundType)resolver.ResolveType(field.TypeName);
+                    (type, var extra) = ((CompoundType)type).GetAccessor(lst, resolver);
 
-                    return offset + type.GetOffset(lst, resolver);
+                    return (type, offset + extra);
                 }
             }
         }
 
-        throw new Exception();
+        throw new Exception($"Failed accessor on type {Name}");
     }
 
     internal void ComputeSize(Resolver resolver)

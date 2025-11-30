@@ -11,7 +11,7 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class ThrowStatement : Statement
 {
-    public required string Message { get; set; }
+    public required string MessageString { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
@@ -24,7 +24,7 @@ public class ThrowStatement : Statement
                     Name = "up-modify-goal",
                     Arg0 = state.Memory.ExceptionCode.ToString(),
                     Arg1 = "c:=",
-                    Arg2 = state.Exceptions[Message].ToString()
+                    Arg2 = state.Exceptions[MessageString].ToString()
                 }
             },
             new JumpInstruction()
@@ -48,6 +48,6 @@ public class ThrowStatement : Statement
 
     protected private override void ValidateStatement(Resolver resolver)
     {
-        ThrowIf(string.IsNullOrWhiteSpace(Message), "Message is empty");
+        ThrowIf(string.IsNullOrWhiteSpace(MessageString), "MessageString is empty");
     }
 }

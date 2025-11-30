@@ -32,10 +32,10 @@ internal class State
             .SelectMany(x => x.Statements)
             .OfType<ThrowStatement>())
         {
-            if (!exceptions.ContainsKey(thrw.Message))
+            if (!exceptions.ContainsKey(thrw.MessageString))
             {
                 var code = Math.Max(100, exceptions.Values.Max() + 1);
-                exceptions.Add(thrw.Message, code);
+                exceptions.Add(thrw.MessageString, code);
             }
         }
 

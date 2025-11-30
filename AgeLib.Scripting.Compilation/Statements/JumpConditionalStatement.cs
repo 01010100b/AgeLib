@@ -10,7 +10,7 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class JumpConditionalStatement : Statement
 {
-    public required string ConditionVariable { get; set; }
+    public required string Condition { get; set; }
     public required LabelStatement Label { get; set; }
 
     internal override List<Instruction> Compile(State state)

@@ -39,9 +39,6 @@ public class Scope : Validated
         }
     }
 
-    internal int GetSize(Resolver resolver)
-        => Variables.Where(x => x is not Constant).Sum(x => resolver.ResolveType(x.TypeName).Size);
-
     internal override void Validate(Resolver resolver)
     {
         throw new NotImplementedException();

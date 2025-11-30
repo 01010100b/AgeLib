@@ -11,9 +11,9 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class CallStatement : Statement
 {
-    public string? ResultVariable { get; set; }
+    public string? Result { get; set; }
     public required string MethodName { get; set; }
-    public required List<string> ArgumentsVariables { get; set; }
+    public required List<string> Arguments { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
@@ -41,10 +41,10 @@ public class CallStatement : Statement
 
         // copy arguments
 
-        for (int i = 0; i < ArgumentsVariables.Count; i++)
+        for (int i = 0; i < Arguments.Count; i++)
         {
-            var argument = state.Resolver.ResolveVariable(ArgumentsVariables[i], Scope);
-            var parameter = state.Resolver.ResolveVariable(callee.ParametersVariables[i], callee.Scope);
+            var argument = state.Resolver.ResolveVariable(Arguments[i], Scope);
+            var parameter = state.Resolver.ResolveVariable(callee.Parameters[i], callee.Scope);
             var size = state.Resolver.ResolveType(argument.TypeName).Size;
             var from = state.Memory.GetAddress(argument);
             var to = state.Memory.GetAddress(parameter);
@@ -123,7 +123,15 @@ public class CallStatement : Statement
 
     internal override IEnumerable<string> GetVariables()
     {
-        throw new NotImplementedException();
+        foreach (var argument in Arguments)
+        {
+            yield return argument;
+        }
+
+        if (Result is not null)
+        {
+            yield return Result;
+        }
     }
 
     protected private override void ValidateStatement(Resolver resolver)

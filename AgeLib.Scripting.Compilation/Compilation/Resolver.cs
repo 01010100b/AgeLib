@@ -56,14 +56,6 @@ internal class Resolver
                 stack.Push(import);
             }
         }
-
-        foreach (var method in ResolvedModules.SelectMany(x => x.Methods).Where(x => x.ReturnTypeName == "System.Void"))
-        {
-            if (method.Statements[^1] is not ReturnStatement)
-            {
-                method.Statements.Add(new ReturnStatement() { Scope = method.Scope });
-            }
-        }
     }
 
     public Module ResolveModule(string name)
@@ -100,9 +92,25 @@ internal class Resolver
     public Method ResolveMethod(Statement statement)
         => ResolvedModules.SelectMany(x => x.Methods).Single(x => x.Statements.Contains(statement));
 
-    public Variable ResolveVariable(string name, Scope? scope)
+    public Variable ResolveVariable(string name, Scope scope)
     {
-        throw new NotImplementedException();
+        foreach (var variable in scope.GetLocalsInScope())
+        {
+            if (variable.Name == name)
+            {
+                return variable;
+            }
+        }
+
+        foreach (var variable in ResolvedModules.Select(x => x.GlobalScope).SelectMany(x => x.Variables))
+        {
+            if (variable.Name == name)
+            {
+                return variable;
+            }
+        }
+
+        throw new Exception($"Failed to resolve variable {name}.");
     }
 
     public bool IsAccessible(string name, Scope scope)
@@ -178,6 +186,11 @@ internal class Resolver
                 new() { Name = "Y", TypeName = "System.Int"}
             ]
         });
+
+        foreach (var type in system_module.Types)
+        {
+            system_module.Exports.Add(type.Name);
+        }
 
         return system_module;
     }

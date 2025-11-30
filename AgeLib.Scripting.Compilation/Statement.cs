@@ -18,6 +18,13 @@ public abstract class Statement : Validated
 
     internal sealed override void Validate(Resolver resolver)
     {
+        foreach (var variable in GetVariables())
+        {
+            ThrowIf(!resolver.IsAccessible(variable, Scope), $"Variable {variable} is not accessible.");
+            var v = resolver.ResolveVariable(variable, Scope);
+            ThrowIf(!resolver.IsAccessible(v.TypeName, Scope), $"Type {v.TypeName} is not accessible.");
+        }
+
         ValidateStatement(resolver);
     }
 

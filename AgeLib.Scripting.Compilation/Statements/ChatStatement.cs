@@ -11,9 +11,9 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class ChatStatement : Statement
 {
-    public required string Player { get; set; }
-    public required string Message { get; set; }
-    public string? DataVariable { get; set; }
+    public required string PlayerString { get; set; }
+    public required string MessageString { get; set; }
+    public string? Data { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {

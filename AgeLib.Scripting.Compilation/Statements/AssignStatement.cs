@@ -10,26 +10,43 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class AssignStatement : Statement
 {
-    public required string ResultVariable { get; set; }
-    public required string SourceVariable { get; set; }
+    public required string Result { get; set; }
+    public required string Source { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
-        throw new NotImplementedException();
+        var instructions = new List<Instruction>();
+        var result = state.Resolver.ResolveVariable(Result, Scope);
+        var source = state.Resolver.ResolveVariable(Source, Scope);
+        var type = state.Resolver.ResolveType(result.TypeName);
+        var from = state.Memory.GetAddress(source);
+        var to = state.Memory.GetAddress(result);
+        var size = type.Size;
+
+        instructions.AddRange(state.Copy(from, false, to, false, size, false));
+
+        return instructions;
     }
 
     internal override Statement Copy(Scope scope, IReadOnlyDictionary<string, string> variables)
     {
-        throw new NotImplementedException();
+        return new AssignStatement()
+        {
+            Scope = scope,
+            Result = variables[Result],
+            Source = variables[Source]
+        };
     }
 
     internal override IEnumerable<string> GetVariables()
-    {
-        throw new NotImplementedException();
-    }
+        => [Result, Source];
 
     private protected override void ValidateStatement(Resolver resolver)
     {
-        throw new NotImplementedException();
+        var result = resolver.ResolveVariable(Result, Scope);
+        var source = resolver.ResolveVariable(Source, Scope);
+
+        ThrowIf(result is Constant, $"Result is a constant.");
+        ThrowIf(result.TypeName != source.TypeName, $"Result and Source are not same type.");
     }
 }

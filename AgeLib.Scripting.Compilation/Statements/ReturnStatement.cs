@@ -11,15 +11,15 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class ReturnStatement : Statement
 {
-    public string? ResultVariable { get; set; }
+    public string? Result { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {
         var instructions = new List<Instruction>();
 
-        if (ResultVariable is not null)
+        if (Result is not null)
         {
-            var variable = state.Resolver.ResolveVariable(ResultVariable, Scope);
+            var variable = state.Resolver.ResolveVariable(Result, Scope);
             var size = state.Resolver.ResolveType(variable.TypeName).Size;
             var from = state.Memory.GetAddress(variable);
             var to = state.Memory.ReturnValueBase;

@@ -10,8 +10,8 @@ namespace AgeLib.Scripting.Compilation.Statements;
 
 public class FieldGetStatement : Statement
 {
-    public required string ResultVariable { get; set; }
-    public required string CompoundTypeVariable { get; set; }
+    public required string Result { get; set; }
+    public required string Variable { get; set; }
     public required List<string> Accessors { get; set; }
 
     internal override List<Instruction> Compile(State state)

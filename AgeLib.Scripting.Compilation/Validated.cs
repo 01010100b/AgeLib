@@ -31,12 +31,8 @@ public abstract class Validated
 
     public static void ValidateModuleName(string name)
     {
-        var regex = "^[a-zA-Z][a-zA-Z0-9]*(.[a-zA-Z][a-zA-Z0-9]*)*$";
-
-        if (!Regex.IsMatch(name, regex))
-        {
-            throw new ValidationException($"{name} is not a valid name.");
-        }
+        const string REGEX = "^[a-zA-Z][a-zA-Z0-9]*(.[a-zA-Z][a-zA-Z0-9]*)*$";
+        ThrowIf(!Regex.IsMatch(name, REGEX), $"{name} is not a valid name.");
     }
 
     public static void ValidateMethodName(string name)
@@ -54,17 +50,13 @@ public abstract class Validated
             name = GetSimpleName(name);
         }
 
-        var regex = "^[_a-zA-Z][_a-zA-Z0-9]*$";
-        
-        if (!Regex.IsMatch(name, regex))
-        {
-            throw new ValidationException($"{name} is not a valid variable name.");
-        }
+        const string REGEX = "^[_a-zA-Z][_a-zA-Z0-9]*$";
+        ThrowIf(!Regex.IsMatch(name, REGEX), $"{name} is not a valid variable name.");
     }
 
     internal abstract void Validate(Resolver resolver);
 
-    protected void ThrowIf(bool condition, string message)
+    protected static void ThrowIf(bool condition, string message)
     {
         if (condition)
         {
@@ -72,7 +64,7 @@ public abstract class Validated
         }
     }
 
-    protected void Throw(string message)
+    protected static void Throw(string message)
     {
         throw new ValidationException(message);
     }

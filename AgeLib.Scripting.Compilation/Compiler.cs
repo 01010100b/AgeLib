@@ -19,10 +19,17 @@ public class Compiler
     {
         var resolver = new Resolver(module, [.. resolvers]);
         var state = new State(resolver);
+        var main = resolver.ResolveMethod(main_method);
+        main.ValidateMain();
+
+        foreach (var m in resolver.ResolvedModules)
+        {
+            m.Validate(resolver);
+        }
+
         var instructions = new List<Instruction>();
 
         instructions.AddRange(GetPrefix(state));
-        var main = resolver.ResolveMethod(main_method);
         instructions.AddRange(MethodCompiler.Compile(main, state));
 
         foreach (var method in resolver.ResolvedModules.SelectMany(x => x.Methods).Except([main]))
