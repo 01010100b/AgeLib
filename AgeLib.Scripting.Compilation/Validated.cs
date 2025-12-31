@@ -1,5 +1,4 @@
 ﻿using AgeLib.Scripting.Compilation.Compilation;
-using AgeLib.Scripting.Compilation.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,48 +14,54 @@ public abstract class Validated
     {
     }
 
-    public static string GetModuleName(string name)
+    internal static string GetModuleName(string name)
     {
         var index = name.LastIndexOf('.');
 
         return name[..index];
     }
 
-    public static string GetSimpleName(string name)
+    internal static string GetSimpleName(string name)
     {
         var index = name.LastIndexOf('.');
 
         return name[(index + 1)..];
     }
 
-    public static void ValidateModuleName(string name)
+    internal static bool IsValidModuleName(string name)
     {
         const string REGEX = "^[a-zA-Z][a-zA-Z0-9]*(.[a-zA-Z][a-zA-Z0-9]*)*$";
-        ThrowIf(!Regex.IsMatch(name, REGEX), $"{name} is not a valid name.");
+
+        return Regex.IsMatch(name, REGEX);
     }
 
-    public static void ValidateMethodName(string name)
-        => ValidateModuleName(name);
+    internal static bool IsValidMethodName(string name)
+        => IsValidModuleName(name);
 
-    public static void ValidateTypeName(string name)
-        => ValidateModuleName(Type.GetBaseTypeName(name));
+    internal static bool IsValidTypeName(string name)
+        => IsValidModuleName(Type.GetBaseTypeName(name));
 
-    public static void ValidateVariableName(string name)
+    internal static bool IsValidVariableName(string name)
     {
         if (name.Contains('.'))
         {
             var module_name = GetModuleName(name);
-            ValidateModuleName(module_name);
             name = GetSimpleName(name);
+
+            if (!IsValidModuleName(module_name))
+            {
+                return false;
+            }
         }
 
         const string REGEX = "^[_a-zA-Z][_a-zA-Z0-9]*$";
-        ThrowIf(!Regex.IsMatch(name, REGEX), $"{name} is not a valid variable name.");
+
+        return Regex.IsMatch(name, REGEX);
     }
 
     internal abstract void Validate(Resolver resolver);
 
-    protected static void ThrowIf(bool condition, string message)
+    protected private void ThrowIf(bool condition, string message)
     {
         if (condition)
         {
@@ -64,7 +69,7 @@ public abstract class Validated
         }
     }
 
-    protected static void Throw(string message)
+    protected private void Throw(string message)
     {
         throw new ValidationException(message);
     }

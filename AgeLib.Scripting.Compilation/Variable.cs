@@ -15,7 +15,7 @@ public class Variable : Validated
     internal override void Validate(Resolver resolver)
     {
         ThrowIf(TypeName == "System.Void", $"Variable {Name} has type System.Void.");
-        ValidateVariableName(Name);
-        ValidateTypeName(TypeName);
+        ThrowIf(!IsValidVariableName(Name), $"{Name} is not a valid variable name.");
+        ThrowIf(!IsValidTypeName(TypeName), $"{TypeName} is not a valid type name.");
     }
 }

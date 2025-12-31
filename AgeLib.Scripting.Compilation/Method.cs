@@ -22,8 +22,8 @@ public class Method : Validated
 
     internal override void Validate(Resolver resolver)
     {
-        ValidateMethodName(Name);
-        ValidateTypeName(ReturnTypeName);
+        ThrowIf(!IsValidMethodName(Name), $"{Name} is not a valid method name.");
+        ThrowIf(!IsValidTypeName(ReturnTypeName), $"{ReturnTypeName} is not a valid type name.");
         ThrowIf(Type.IsArrayType(ReturnTypeName), $"Can not return array from method {Name}.");
         ThrowIf(!resolver.IsAccessible(ReturnTypeName, Scope), 
             $"Return type {ReturnTypeName} is not accessible from method {Name}.");

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Compilation.Statements;
+namespace AgeLib.Scripting.Compilation.Statements.Basic;
 
 public class FieldGetStatement : Statement
 {

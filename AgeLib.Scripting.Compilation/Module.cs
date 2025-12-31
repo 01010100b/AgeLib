@@ -18,14 +18,16 @@ public class Module : Validated
 
     internal override void Validate(Resolver resolver)
     {
-        ValidateModuleName(Name);
+        ThrowIf(!IsValidModuleName(Name), $"{Name} is not a valid module name.");
 
-        var names = Types.Select(x => x.Name).Concat(Methods.Select(x => x.Name))
-            .Concat(GlobalScope.Variables.Select(x => x.Name)).ToList();
-
-        foreach (var name in names)
+        var names = new HashSet<string>();
+        
+        foreach (var name in Types.Select(x => x.Name)
+            .Concat(Methods.Select(x => x.Name))
+            .Concat(GlobalScope.Variables.Select(x => x.Name)))
         {
-            ThrowIf(GetModuleName(name) != Name, $"Name {name} does not start with module name.");
+            ThrowIf(names.Contains(name), $"Name {name} already exists.");
+            ThrowIf(GetModuleName(name) != Name, $"Name {name} does not start with module name {Name}.");
         }
 
         foreach (var export in Exports)
@@ -33,6 +35,21 @@ public class Module : Validated
             ThrowIf(!names.Contains(export), $"Export {export} does not exist in module.");
         }
 
-        throw new NotImplementedException();
+        foreach (var import in Imports)
+        {
+            ThrowIf(!IsValidModuleName(import), $"{import} is not a valid import name.");
+        }
+
+        foreach (var type in Types)
+        {
+            type.Validate(resolver);
+        }
+
+        foreach (var method in Methods)
+        {
+            method.Validate(resolver);
+        }
+
+        GlobalScope.Validate(resolver);
     }
 }

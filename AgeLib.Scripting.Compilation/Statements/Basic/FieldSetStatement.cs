@@ -1,5 +1,4 @@
 ﻿using AgeLib.Scripting.Assembly;
-using AgeLib.Scripting.Assembly.Instructions;
 using AgeLib.Scripting.Compilation.Compilation;
 using System;
 using System.Collections.Generic;
@@ -7,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.Scripting.Compilation.Statements;
+namespace AgeLib.Scripting.Compilation.Statements.Basic;
 
-public class ChatStatement : Statement
+public class FieldSetStatement : Statement
 {
-    public required string PlayerString { get; set; }
-    public required string MessageString { get; set; }
-    public string? Data { get; set; }
+    public required string Variable { get; set; }
+    public required List<string> Accessors { get; set; }
+    public required string Value { get; set; }
 
     internal override List<Instruction> Compile(State state)
     {

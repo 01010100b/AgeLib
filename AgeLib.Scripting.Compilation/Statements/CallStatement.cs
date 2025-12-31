@@ -136,6 +136,26 @@ public class CallStatement : Statement
 
     protected private override void ValidateStatement(Resolver resolver)
     {
-        throw new NotImplementedException();
+        ThrowIf(!resolver.IsAccessible(MethodName, Scope), $"Method {MethodName} is not accessible");
+        var method = resolver.ResolveMethod(MethodName);
+        ThrowIf(Result is not null && method.ReturnTypeName == "System.Void",
+            $"Method {MethodName} returns System.Void but Result is not null.");
+
+        if (Result is not null)
+        {
+            var result = resolver.ResolveVariable(Result, Scope);
+            ThrowIf(result.TypeName != method.ReturnTypeName,
+                $"Method {MethodName} returns {method.ReturnTypeName} but Result has type {result.TypeName}.");
+        }
+
+        ThrowIf(Arguments.Count != method.Parameters.Count,
+            $"Method {MethodName} has {method.Parameters.Count} parrameters but call statement has {Arguments.Count} arguments.");
+
+        for (int i = 0; i < Arguments.Count; i++)
+        {
+            var argument = resolver.ResolveVariable(Arguments[i], Scope);
+            var parameter = resolver.ResolveVariable(method.Parameters[i], method.Scope);
+            ThrowIf(argument.TypeName != parameter.TypeName, $"Argument {i} has wrong type.");
+        }
     }
 }

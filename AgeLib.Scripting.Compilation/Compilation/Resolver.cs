@@ -18,7 +18,6 @@ internal class Resolver
     public Resolver(Module main_module, List<Func<string, Module?>> resolvers)
     {
         Modules.Add("System", GenerateSystemModule());
-
         Modules.Add(main_module.Name, main_module);
         var stack = new Stack<string>();
         
@@ -59,16 +58,10 @@ internal class Resolver
     }
 
     public Module ResolveModule(string name)
-    {
-        Validated.ValidateModuleName(name);
-
-        return Modules[name];
-    }
+        => Modules[name];
 
     public Type ResolveType(string name)
     {
-        Validated.ValidateTypeName(name);
-
         if (Type.IsArrayType(name))
         {
             if (!ArrayTypes.TryGetValue(name, out var type))
