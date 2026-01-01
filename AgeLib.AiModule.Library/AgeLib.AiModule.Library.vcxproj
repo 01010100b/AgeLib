@@ -146,10 +146,9 @@
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AiAction.h" />
-    <ClInclude Include="AiExpert.h" />
-    <ClInclude Include="AiFact.h" />
-    <ClInclude Include="SymbolHashNode.h" />
+    <ProjectReference Include="..\AgeLib.AiModule.Engine\AgeLib.AiModule.Engine.csproj">
+      <Project>{cd71ccf3-ab19-4c6f-8d1c-dde5180f5b74}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

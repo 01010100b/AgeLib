@@ -12,11 +12,14 @@ namespace ConsoleApp1;
 internal class Program
 {
     private const string WK_FOLDER = @"F:\AoE\WK\Age2_x1";
-    private const string DIST_FOLDER = @"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Library\dist\Release";
+    private const string LIB_FOLDER = @"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Library\dist\Debug";
+    private const string ENGINE_FOLDER = @"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Engine\bin\Debug\net8.0";
 
     static void Main(string[] args)
     {
-        FileSystem.CopyDirectory(DIST_FOLDER, WK_FOLDER);
+        FileSystem.CopyDirectory(LIB_FOLDER, WK_FOLDER);
+        FileSystem.CopyDirectory(ENGINE_FOLDER, WK_FOLDER);
+
         var wk = Path.Combine(WK_FOLDER, "WK.exe");
         var dll = Path.Combine(WK_FOLDER, "AgeLib.AiModule.Library.dll");
         //dll = @"F:\Repos\01010100b\01010100b\AoE2Lib\AoE2Lib\aimodule-aoc.dll";

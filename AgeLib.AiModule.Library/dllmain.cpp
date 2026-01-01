@@ -1,12 +1,9 @@
 #include <Windows.h>
 #include <stdint.h>
 #include <detours\detours.h>
-#include <iostream>
-#include <io.h>
-#include "AiExpert.h"
 
-inline static int32_t(__thiscall* FuncRunList)(void* aiExpert, int listId, void* statsOutput) = 0;
-static int32_t __stdcall DetouredRunList(int listId, void* statsOutput);
+inline static int32_t(__thiscall* FuncRunList)(void* ai_expert, int list_id, void* stats_output) = 0;
+static int32_t __stdcall DetouredRunList(int list_id, void* stats_output);
 
 #pragma unmanaged
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -26,7 +23,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			DetourTransactionBegin();
 			DetourUpdateThread(GetCurrentThread());
 			DetourAttach(&(PVOID&)FuncRunList, DetouredRunList);
-			LONG transactionResult = DetourTransactionCommit();
+			LONG transaction_result = DetourTransactionCommit();
 
 			break;
 		}
@@ -45,26 +42,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 
 using namespace System;
-using namespace System::IO;
+using namespace AgeLib::AiModule::Engine;
 
 #pragma managed
-static void TestMethod(int id)
+static void Passthrough(intptr_t id)
 {
-	String^ fileName = "F:\\textfile.txt";
-
-	StreamWriter^ sw = gcnew StreamWriter(fileName, true);
-	sw->WriteLine(DateTime::Now);
-	sw->WriteLine("got id {0}", id);
-	sw->Close();
+	Receiver::Receive((IntPtr)id);
 }
 
 #pragma unmanaged
-static int32_t __stdcall DetouredRunList(int listId, void* statsOutput)
+static int32_t __stdcall DetouredRunList(int list_id, void* stats_output)
 {
-	void* expert;
+	void* expert = nullptr;
 	__asm mov expert, ECX
-	TestMethod((int)listId);
-	TestMethod((int)statsOutput);
+	Passthrough((intptr_t)expert);
 
-	return FuncRunList(expert, listId, statsOutput);
+	return FuncRunList(expert, list_id, stats_output);
 }
