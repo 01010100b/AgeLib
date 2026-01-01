@@ -1,0 +1,7 @@
+Package: detours
+Version: 4.0.1
+Port-Version: 8
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 794ca81da55a417d2b4c9490431251cdcabcb12e736069bae96d1fa650e23a9e
+Description: Detours is a software package for monitoring and instrumenting API calls on Windows.
