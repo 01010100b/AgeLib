@@ -6,6 +6,7 @@ using BinaryLibs.Utils;
 using Newtonsoft.Json;
 using Reloaded.Injector;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ConsoleApp1;
 

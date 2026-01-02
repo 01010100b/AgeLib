@@ -58,8 +58,7 @@ static int32_t __stdcall DetouredRunList(int list_id, void* stats_output)
 	void* expert = nullptr;
 	__asm mov expert, ECX
 
-	int32_t result = FuncRunList(expert, list_id, stats_output);
 	Passthrough((intptr_t)expert);
 
-	return result;
+	return FuncRunList(expert, list_id, stats_output);
 }

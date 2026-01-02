@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AgeLib.AiModule.Engine;
 
-internal class ExpertEngine
+internal class ExpertEngine : IEngine
 {
     public int MyPlayer { get; internal set; } = -1;
 
@@ -64,9 +64,6 @@ internal class ExpertEngine
 
         return true;
     }
-
-    public bool Check(string name, int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0)
-        => Execute(name, arg1, arg2, arg3, arg4) != 0;
 
     public int Execute(string name, int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0)
     {

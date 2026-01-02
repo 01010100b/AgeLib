@@ -53,7 +53,7 @@ public static class Receiver
 
         for (int i = 0; i <= 8; i++)
         {
-            if (Engine.Check("player-number", i))
+            if (Engine.Execute("player-number", i) == 1)
             {
                 Engine.MyPlayer = i;
                 Log.Shared.Debug($"Current player {Engine.MyPlayer}");
@@ -67,8 +67,14 @@ public static class Receiver
             return;
         }
 
-        Engine.Execute("set-goal", 171, 237);
-        var val = Engine.GetGoal(171);
-        Log.Shared.Debug($"goal {val}");
+        var sw = Stopwatch.StartNew();
+
+        for (int i = 0; i < 10000; i++)
+        {
+            Engine.Execute("set-goal", 171, 237);
+            var val = Engine.GetGoal(171);
+        }
+        
+        Log.Shared.Debug($"time {sw.Elapsed}");
     }
 }
