@@ -9,19 +9,23 @@ using System.Threading.Tasks;
 
 namespace AgeLib.AiModule.Engine;
 
-internal class Game
+internal class ExpertEngine
 {
-    private IntPtr LastInitialization { get; set; } = IntPtr.Zero;
+    public int MyPlayer { get; internal set; } = -1;
+
+    private IntPtr ExpertPtr { get; set; } = IntPtr.Zero;
+    private IntPtr GamePtr { get; set; } = IntPtr.Zero;
     private Dictionary<string, Command> Commands { get; } = [];
 
-    public bool Initialize(IntPtr expert_ptr)
+    public bool Initialize(IntPtr expert_ptr, IntPtr game_ptr)
     {
-        if (LastInitialization == expert_ptr)
+        if (ExpertPtr == expert_ptr)
         {
             return false;
         }
 
-        LastInitialization = expert_ptr;
+        ExpertPtr = expert_ptr;
+        GamePtr = game_ptr;
         var expert = Marshal.PtrToStructure<AiExpert>(expert_ptr);
         Commands.Clear();
 
@@ -69,5 +73,35 @@ internal class Game
         var command = Commands[name];
 
         return command.Execute(arg1, arg2, arg3, arg4);
+    }
+
+    public int GetGoal(int goal)
+    {
+        Assert.That(goal >= 1 && goal <= 512);
+
+        goal--;
+
+        unsafe
+        {
+            var ai = GetAi(MyPlayer);
+
+            if (goal < 40)
+            {
+                return ai->BaseGoals[goal];
+            }
+            else
+            {
+                return ai->ExtendedGoals[4 + goal - 40];
+            }
+        }
+    }
+
+    private unsafe Ai* GetAi(int player)
+    {
+        var game = *(Game**)GamePtr;
+        var world = game->World;
+        var p = world->Players[player];
+
+        return p->Ai;
     }
 }

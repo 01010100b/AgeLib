@@ -39,15 +39,15 @@ internal class Command
                 switch (Argc)
                 {
                     case 0:
-                        return ((delegate*<int>)Function)();
+                        return ((delegate* unmanaged<int>)Function)();
                     case 1:
-                        return ((delegate*<int, int>)Function)(arg1);
+                        return ((delegate* unmanaged<int, int>)Function)(arg1);
                     case 2:
-                        return ((delegate*<int, int, int>)Function)(arg1, arg2);
+                        return ((delegate* unmanaged<int, int, int>)Function)(arg1, arg2);
                     case 3:
-                        return ((delegate*<int, int, int, int>)Function)(arg1, arg2, arg3);
+                        return ((delegate* unmanaged<int, int, int, int>)Function)(arg1, arg2, arg3);
                     case 4:
-                        return ((delegate*<int, int, int, int, int>)Function)(arg1, arg2, arg3, arg4);
+                        return ((delegate* unmanaged<int, int, int, int, int>)Function)(arg1, arg2, arg3, arg4);
                 }
 
                 return 0;
@@ -57,15 +57,15 @@ internal class Command
                 switch (Argc)
                 {
                     case 0:
-                        ((delegate*<void>)Function)(); break;
+                        ((delegate* unmanaged<void>)Function)(); break;
                     case 1:
-                        ((delegate*<int, void>)Function)(arg1); break;
+                        ((delegate* unmanaged<int, void>)Function)(arg1); break;
                     case 2:
-                        ((delegate*<int, int, void>)Function)(arg1, arg2); break;
+                        ((delegate* unmanaged<int, int, void>)Function)(arg1, arg2); break;
                     case 3:
-                        ((delegate*<int, int, int, void>)Function)(arg1, arg2, arg3); break;
+                        ((delegate* unmanaged<int, int, int, void>)Function)(arg1, arg2, arg3); break;
                     case 4:
-                        ((delegate*<int, int, int, int, void>)Function)(arg1, arg2, arg3, arg4); break;
+                        ((delegate* unmanaged<int, int, int, int, void>)Function)(arg1, arg2, arg3, arg4); break;
                 }
 
                 return 1;

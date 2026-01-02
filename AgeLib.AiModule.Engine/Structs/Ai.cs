@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace AgeLib.AiModule.Engine.Structs;
 
 [StructLayout(LayoutKind.Sequential)]
-internal readonly unsafe struct SymbolHashNode
+internal unsafe struct Ai
 {
-    public readonly SymbolHashNode* Next;
-    public readonly byte* Text;
-    public readonly byte Type;
-    public readonly ushort Id;
+    private fixed byte Unknown0[5988];
+    public fixed int BaseGoals[40];
+    private fixed byte Unknown1[4596];
+    public readonly int* ExtendedGoals;
 }

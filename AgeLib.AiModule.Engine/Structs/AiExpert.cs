@@ -28,5 +28,5 @@ internal readonly unsafe struct AiExpert
     public readonly void* CurrentList;
     public readonly void* CurrentGroupTable;
     public readonly int GlobalSymbolTableSize;
-    public readonly SymbolHashNode** Symbols;
+    public readonly SymbolNode** Symbols;
 }
