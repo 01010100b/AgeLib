@@ -18,8 +18,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 			uintptr_t BASE_ADDR = (uintptr_t)GetModuleHandle(nullptr);
 			const int32_t REFERENCE_BASE_ADDR = 0x400000;
 			GamePtr = BASE_ADDR + (0x7912A0 - REFERENCE_BASE_ADDR);
-			const int32_t ADDR_FUNC_RUN_LIST = 0x5F9C10;
-			uintptr_t func_run = BASE_ADDR + (ADDR_FUNC_RUN_LIST - REFERENCE_BASE_ADDR);
+			uintptr_t func_run = BASE_ADDR + (0x5F9C10 - REFERENCE_BASE_ADDR);
 			*reinterpret_cast<uintptr_t*>(&FuncRunList) = func_run;
 
 			DetourTransactionBegin();
@@ -47,9 +46,9 @@ using namespace System;
 using namespace AgeLib::AiModule::Engine;
 
 #pragma managed
-static void Passthrough(intptr_t id)
+static void Passthrough(intptr_t expert)
 {
-	Receiver::Receive((IntPtr)id, (IntPtr)GamePtr);
+	Receiver::Receive((IntPtr)expert, (IntPtr)GamePtr);
 }
 
 #pragma unmanaged

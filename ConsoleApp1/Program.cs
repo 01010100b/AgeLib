@@ -6,15 +6,20 @@ using BinaryLibs.Utils;
 using Newtonsoft.Json;
 using Reloaded.Injector;
 using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
+using System.Text;
 
 namespace ConsoleApp1;
 
 internal class Program
 {
+#if DEBUG
+    private const string CONFIG = "Debug";
+#else
+    private const string CONFIG = "Release";
+#endif
     private const string WK_FOLDER = @"F:\AoE\WK\Age2_x1";
-    private const string LIB_FOLDER = @"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Library\dist\Debug";
-    private const string ENGINE_FOLDER = @"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Engine\bin\Debug\net8.0";
+    private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Library\dist\{CONFIG}";
+    private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Engine\bin\{CONFIG}\net8.0";
 
     static void Main(string[] args)
     {
@@ -23,12 +28,11 @@ internal class Program
 
         var wk = Path.Combine(WK_FOLDER, "WK.exe");
         var dll = Path.Combine(WK_FOLDER, "AgeLib.AiModule.Library.dll");
-        //dll = @"F:\Repos\01010100b\01010100b\AoE2Lib\AoE2Lib\aimodule-aoc.dll";
         var info = new ProcessStartInfo(wk);
         var process = Process.Start(info)!;
         process.WaitForInputIdle();
         Thread.Sleep(10000);
-        Console.WriteLine(process.HasExited);
+
         using var injector = new Injector(process);
         var addr = injector.Inject(dll);
         Console.WriteLine($"addr {addr}");

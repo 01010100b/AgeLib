@@ -8,7 +8,5 @@ namespace AgeLib.AiModule.Engine;
 
 public interface IBot
 {
-    public string Name { get; }
-
     public void Tick(IEngine engine);
 }

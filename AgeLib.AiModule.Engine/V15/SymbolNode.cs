@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.AiModule.Engine.Structs;
+namespace AgeLib.AiModule.Engine.V15;
 
 [StructLayout(LayoutKind.Sequential)]
 internal readonly unsafe struct SymbolNode

@@ -10,18 +10,19 @@ namespace AgeLib.AiModule.Engine;
 
 public static class Receiver
 {
+    private static string Folder { get; } = Path.GetDirectoryName(Environment.ProcessPath) ?? throw new Exception();
     private static ExpertEngine Engine { get; } = new();
-    private static bool Initialized { get; set; } = false;
+    private static Dictionary<int, IBot> Bots { get; } = [];
+
+    static Receiver()
+    {
+        var file = Path.Combine(Folder, "agelib-ai-module.log");
+        Log.Shared.AddFileListener(file);
+        Log.Shared.Information($"Folder: {Folder}");
+    }
 
     public static void Receive(IntPtr expert_ptr, IntPtr game_ptr)
     {
-        if (!Initialized)
-        {
-            Log.Shared.Level = Log.LogLevel.TRACE;
-            Log.Shared.AddFileListener(@"F:\text.txt");
-            Initialized = true;
-        }
-
         try
         {
             Log.Shared.Trace($"Received expert ptr {expert_ptr}");
@@ -44,37 +45,35 @@ public static class Receiver
 
     private static void StartNewGame()
     {
+        Log.Shared.Information($"Starting new game");
 
+        Bots.Clear();
+
+        for (int i = 1; i <= 8; i++)
+        {
+            Bots.Add(i, new TestBot());
+        }
     }
 
     private static void Tick()
     {
         Engine.MyPlayer = -1;
 
-        for (int i = 0; i <= 8; i++)
+        for (int i = 1; i <= 8; i++)
         {
             if (Engine.Execute("player-number", i) == 1)
             {
                 Engine.MyPlayer = i;
-                Log.Shared.Debug($"Current player {Engine.MyPlayer}");
 
                 break;
             }
         }
 
-        if (Engine.MyPlayer == -1)
+        if (Engine.MyPlayer == -1 || !Bots.TryGetValue(Engine.MyPlayer, out var bot))
         {
             return;
         }
 
-        var sw = Stopwatch.StartNew();
-
-        for (int i = 0; i < 10000; i++)
-        {
-            Engine.Execute("set-goal", 171, 237);
-            var val = Engine.GetGoal(171);
-        }
-        
-        Log.Shared.Debug($"time {sw.Elapsed}");
+        bot.Tick(Engine);
     }
 }

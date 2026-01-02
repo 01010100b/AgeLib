@@ -16,7 +16,7 @@ internal class Command
     public bool IsFact { get; }
     public int Calls { get; private set; } = 0;
 
-    public Command(string name, IntPtr function, int argc, bool returns_value)
+    public Command(string name, IntPtr function, int argc, bool is_fact)
     {
         Assert.NotEmpty(name);
         Assert.That(function != IntPtr.Zero);
@@ -25,7 +25,7 @@ internal class Command
         Name = name;
         Function = function;
         Argc = argc;
-        IsFact = returns_value;
+        IsFact = is_fact;
     }
 
     public int Execute(int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0)
