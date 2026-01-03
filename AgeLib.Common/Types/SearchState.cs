@@ -5,23 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.AiModule.Engine;
-
-[StructLayout(LayoutKind.Sequential)]
-public readonly struct Point(int x, int y)
-{
-    public readonly int X = x;
-    public readonly int Y = y;
-}
-
-[StructLayout(LayoutKind.Sequential)]
-public readonly struct Cost(int food, int wood, int stone, int gold)
-{
-    public readonly int Food = food;
-    public readonly int Wood = wood;
-    public readonly int Stone = stone;
-    public readonly int Gold = gold;
-}
+namespace AgeLib.Common.Types;
 
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct SearchState(int local_total, int local_last, int remote_total, int remote_last)

@@ -18,7 +18,7 @@ internal class Engine15 : EngineBase
 
     public override bool Initialize(IntPtr config_ptr)
     {
-        var config = Marshal.PtrToStructure<Config15>(config_ptr);
+        var config = Marshal.PtrToStructure<Config>(config_ptr);
         Assert.That(config.ExpertPtr != IntPtr.Zero);
         Assert.That(config.GamePtr != IntPtr.Zero);
         Assert.That(config.CustomStringPtr != IntPtr.Zero);

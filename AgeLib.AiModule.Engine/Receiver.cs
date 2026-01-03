@@ -1,5 +1,6 @@
 ﻿using AgeLib.AiModule.Engine.UP15;
 using BinaryLibs.Utils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,10 +58,13 @@ public static class Receiver
         Log.Shared.Information($"Starting new game");
 
         Bots.Clear();
-
-        for (int i = 1; i <= 8; i++)
+        var file = Path.Combine(Folder, "agelib-ai-module.config");
+        var players = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(file)) ?? throw new Exception();
+        
+        foreach (var player in players)
         {
-            Bots.Add(i, new TestBot());
+            var bot = Loader.Create(player.Value);
+            Bots.Add(player.Key, bot);
         }
     }
 

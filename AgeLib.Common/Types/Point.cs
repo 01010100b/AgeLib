@@ -5,12 +5,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.AiModule.Engine.UP15;
+namespace AgeLib.Common.Types;
 
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct Config15
+public readonly struct Point(int x, int y)
 {
-    public readonly IntPtr ExpertPtr;
-    public readonly IntPtr GamePtr;
-    public readonly IntPtr CustomStringPtr;
+    public readonly int X = x;
+    public readonly int Y = y;
 }

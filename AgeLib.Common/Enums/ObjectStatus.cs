@@ -1,0 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AgeLib.Common.Enums;
+
+public enum ObjectStatus
+{
+    PENDING, READY = 2, RESOURCE, DOWN, GATHER
+}

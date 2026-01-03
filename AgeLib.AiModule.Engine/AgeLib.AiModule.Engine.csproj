@@ -12,4 +12,8 @@
     <PackageReference Include="BinaryLibs.Utils" Version="0.118.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AgeLib.Common\AgeLib.Common.csproj" />
+  </ItemGroup>
+
 </Project>

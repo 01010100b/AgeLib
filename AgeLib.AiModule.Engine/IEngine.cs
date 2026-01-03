@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AgeLib.Common.Enums;
+using AgeLib.Common.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
