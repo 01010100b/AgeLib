@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BinaryLibs.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,67 @@ internal abstract class EngineBase : IEngine
     public abstract bool Initialize(IntPtr config_ptr);
     public abstract void SetCustomString(string str);
 
+    public abstract int GetStrategicNumber(int sn);
+    public abstract void SetStrategicNumber(int sn, int value);
+
+    public int GetStrategicNumber(StrategicNumber sn)
+        => GetStrategicNumber((int)sn);
+
+    public void SetStrategicNumber(StrategicNumber sn, int value)
+        => SetStrategicNumber((int)sn, value);
+
+    public abstract int GetGoal(int goal);
+    public abstract void SetGoal(int goal, int value);
+
+    public virtual Point GetPoint(int goal)
+    {
+        Assert.That(goal >= 41 && goal <= 511);
+
+        return new(GetGoal(goal), GetGoal(goal + 1));
+    }
+
+    public virtual void SetPoint(int goal, Point point)
+    {
+        Assert.That(goal >= 41 && goal <= 511);
+
+        SetGoal(goal, point.X);
+        SetGoal(goal + 1, point.Y);
+    }
+
+    public virtual Cost GetCost(int goal)
+    {
+        Assert.That(goal >= 41 && goal <= 509);
+
+        return new(GetGoal(goal), GetGoal(goal + 1), GetGoal(goal + 2), GetGoal(goal + 3));
+    }
+
+    public virtual void SetCost(int goal, Cost cost)
+    {
+        Assert.That(goal >= 41 && goal <= 509);
+
+        SetGoal(goal, cost.Food);
+        SetGoal(goal + 1, cost.Wood);
+        SetGoal(goal + 2, cost.Stone);
+        SetGoal(goal + 3, cost.Gold);
+    }
+
+    public virtual SearchState GetSearchState(int goal)
+    {
+        Assert.That(goal >= 41 && goal <= 509);
+
+        return new(GetGoal(goal), GetGoal(goal + 1), GetGoal(goal + 2), GetGoal(goal + 3));
+    }
+
+    public virtual void SetSearchState(int goal, SearchState search_state)
+    {
+        Assert.That(goal >= 41 && goal <= 509);
+
+        SetGoal(goal, search_state.LocalTotal);
+        SetGoal(goal + 1, search_state.LocalLast);
+        SetGoal(goal + 2, search_state.RemoteTotal);
+        SetGoal(goal + 3, search_state.RemoteLast);
+    }
+
     public int Execute(string name, int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0)
     {
         var command = Commands[name];
@@ -34,9 +96,6 @@ internal abstract class EngineBase : IEngine
 
     public bool IsSymbolDefined(string symbol)
         => Symbols.Contains(symbol);
-
-    public abstract int GetGoal(int goal);
-    public abstract void SetGoal(int goal, int value);
 
     public void ChatToAll(string str)
         => ChatDataToAll(str, TypeOp.C, 0);

@@ -18,7 +18,7 @@ internal class Engine15 : EngineBase
 
     public override bool Initialize(IntPtr config_ptr)
     {
-        var config = Marshal.PtrToStructure<Config>(config_ptr);
+        var config = Marshal.PtrToStructure<Config15>(config_ptr);
         Assert.That(config.ExpertPtr != IntPtr.Zero);
         Assert.That(config.GamePtr != IntPtr.Zero);
         Assert.That(config.CustomStringPtr != IntPtr.Zero);
@@ -128,24 +128,33 @@ internal class Engine15 : EngineBase
         }
     }
 
+    public override int GetStrategicNumber(int sn)
+    {
+        Assert.That(sn >= 0 && sn <= 511);
+
+        unsafe
+        {
+            return *GetSnPtr(sn);
+        }
+    }
+
+    public override void SetStrategicNumber(int sn, int value)
+    {
+        Assert.That(sn >= 0 && sn <= 511);
+
+        unsafe
+        {
+            *GetSnPtr(sn) = value;
+        }
+    }
+
     public override int GetGoal(int goal)
     {
         Assert.That(goal >= 1 && goal <= 512);
 
-        goal--;
-
         unsafe
         {
-            var ai = GetAi(MyPlayer);
-
-            if (goal < 40)
-            {
-                return ai->BaseGoals[goal];
-            }
-            else
-            {
-                return ai->ExtendedGoals[4 + goal - 40];
-            }
+            return *GetGoalPtr(goal);
         }
     }
 
@@ -153,6 +162,31 @@ internal class Engine15 : EngineBase
     {
         Assert.That(goal >= 1 && goal <= 512);
 
+        unsafe
+        {
+            *GetGoalPtr(goal) = value;
+        }
+    }
+
+    private unsafe int* GetSnPtr(int sn)
+    {
+        unsafe
+        {
+            var ai = GetAi(MyPlayer);
+
+            if (sn < 242)
+            {
+                return ai->BaseStrategicNumbers + sn;
+            }
+            else
+            {
+                return ai->ExtendedStrategicNumbers + sn + 44 - 242;
+            }
+        }
+    }
+
+    private unsafe int* GetGoalPtr(int goal)
+    {
         goal--;
 
         unsafe
@@ -161,11 +195,11 @@ internal class Engine15 : EngineBase
 
             if (goal < 40)
             {
-                ai->BaseGoals[goal] = value;
+                return ai->BaseGoals + goal;
             }
             else
             {
-                ai->ExtendedGoals[4 + goal - 40] = value;
+                return ai->ExtendedGoals + goal + 4 - 40;
             }
         }
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AgeLib.AiModule.Engine.UP15;
 
 [StructLayout(LayoutKind.Sequential)]
-internal readonly struct Config
+internal readonly struct Config15
 {
     public readonly IntPtr ExpertPtr;
     public readonly IntPtr GamePtr;

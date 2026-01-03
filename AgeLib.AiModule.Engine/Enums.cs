@@ -359,12 +359,12 @@ public enum UnitOrder
 
 public enum UnitFormation
 {
-    LINE = 2, BOX = 4, STAGGER = 7, FLANK = 8
+    NONE = -1, LINE = 2, BOX = 4, STAGGER = 7, FLANK = 8
 }
 
 public enum UnitStance
 {
-    AGGRESSIVE, DEFENSIVE, STAND_GROUND, NO_ATTACK
+    NONE = -1, AGGRESSIVE, DEFENSIVE, STAND_GROUND, NO_ATTACK
 }
 
 public enum PlayerStance
