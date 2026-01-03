@@ -12,7 +12,7 @@ namespace AgeLib.AiModule.Engine;
 public static class Receiver
 {
     private static string Folder { get; } = Path.GetDirectoryName(Environment.ProcessPath) ?? throw new Exception();
-    private static Engine15 Engine { get; } = new();
+    private static EngineBase Engine { get; set; } = new Engine15();
     private static Dictionary<int, IBot> Bots { get; } = [];
 
     static Receiver()
@@ -26,7 +26,15 @@ public static class Receiver
     {
         try
         {
-            Assert.That(version == 15);
+            if (version != Engine.Version)
+            {
+                Engine = version switch
+                {
+                    15 => new Engine15(),
+                    _ => throw new NotSupportedException($"Version {version} is not supported.")
+                };
+            }
+
             var newgame = Engine.Initialize(config);
 
             if (newgame)

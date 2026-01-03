@@ -10,6 +10,8 @@ namespace AgeLib.AiModule.Engine.UP15;
 
 internal class Engine15 : EngineBase
 {
+    public override int Version => 15;
+
     private IntPtr ExpertPtr { get; set; } = IntPtr.Zero;
     private IntPtr GamePtr { get; set; } = IntPtr.Zero;
     private IntPtr CustomStringPtr { get; set; } = IntPtr.Zero;
@@ -17,6 +19,9 @@ internal class Engine15 : EngineBase
     public override bool Initialize(IntPtr config_ptr)
     {
         var config = Marshal.PtrToStructure<Config>(config_ptr);
+        Assert.That(config.ExpertPtr != IntPtr.Zero);
+        Assert.That(config.GamePtr != IntPtr.Zero);
+        Assert.That(config.CustomStringPtr != IntPtr.Zero);
 
         if (ExpertPtr == config.ExpertPtr)
         {
@@ -26,14 +31,10 @@ internal class Engine15 : EngineBase
         ExpertPtr = config.ExpertPtr;
         GamePtr = config.GamePtr;
         CustomStringPtr = config.CustomStringPtr;
-        Assert.That(ExpertPtr != IntPtr.Zero);
-        Assert.That(GamePtr != IntPtr.Zero);
-        Assert.That(CustomStringPtr != IntPtr.Zero);
-
-        var expert = Marshal.PtrToStructure<AiExpert>(ExpertPtr);
-
+        
         unsafe
         {
+            var expert = Marshal.PtrToStructure<AiExpert>(ExpertPtr);
             var has_symbol = false;
 
             for (int table = 0; table < expert.GlobalSymbolTableSize; table++)

@@ -8,9 +8,9 @@ namespace V15
 {
 	struct Config
 	{
-		intptr_t expert_ptr;
-		intptr_t game_ptr;
-		intptr_t custom_string_ptr;
+		intptr_t expert_ptr = 0;
+		intptr_t game_ptr = 0;
+		intptr_t custom_string_ptr = 0;
 	};
 
 	static Config config;
@@ -83,7 +83,9 @@ namespace V15
 		{
 			return custom_string;
 		}
-
-		return FuncGetString(expert_engine, string_id);
+		else
+		{
+			return FuncGetString(expert_engine, string_id);
+		}
 	}
 }
