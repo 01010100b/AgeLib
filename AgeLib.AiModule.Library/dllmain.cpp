@@ -1,10 +1,5 @@
 #include <Windows.h>
-#include <stdint.h>
-#include <detours\detours.h>
-
-inline static int32_t(__thiscall* FuncRunList)(void* ai_expert, int list_id, void* stats_output) = 0;
-static int32_t __stdcall DetouredRunList(int list_id, void* stats_output);
-static intptr_t GamePtr;
+#include "v15.h"
 
 #pragma unmanaged
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
@@ -14,50 +9,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 		case DLL_PROCESS_ATTACH:
 		{
 			DisableThreadLibraryCalls(hModule);
-
-			uintptr_t BASE_ADDR = (uintptr_t)GetModuleHandle(nullptr);
-			const int32_t REFERENCE_BASE_ADDR = 0x400000;
-			GamePtr = BASE_ADDR + (0x7912A0 - REFERENCE_BASE_ADDR);
-			uintptr_t func_run = BASE_ADDR + (0x5F9C10 - REFERENCE_BASE_ADDR);
-			*reinterpret_cast<uintptr_t*>(&FuncRunList) = func_run;
-
-			DetourTransactionBegin();
-			DetourUpdateThread(GetCurrentThread());
-			DetourAttach(&(PVOID&)FuncRunList, DetouredRunList);
-			LONG transaction_result = DetourTransactionCommit();
+			V15::Attach();
 
 			break;
 		}
 		case DLL_PROCESS_DETACH:
 		{
-			DetourTransactionBegin();
-			DetourUpdateThread(GetCurrentThread());
-			DetourDetach(&(PVOID&)FuncRunList, DetouredRunList);
-			DetourTransactionCommit();
-			
+			V15::Detach();
+
 			break;
 		}
 	}
 
 	return TRUE;
-}
-
-using namespace System;
-using namespace AgeLib::AiModule::Engine;
-
-#pragma managed
-static void Passthrough(intptr_t expert)
-{
-	Receiver::Receive((IntPtr)expert, (IntPtr)GamePtr);
-}
-
-#pragma unmanaged
-static int32_t __stdcall DetouredRunList(int list_id, void* stats_output)
-{
-	void* expert = nullptr;
-	__asm mov expert, ECX
-
-	Passthrough((intptr_t)expert);
-
-	return FuncRunList(expert, list_id, stats_output);
 }

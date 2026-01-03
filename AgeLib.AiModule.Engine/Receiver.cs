@@ -1,4 +1,5 @@
-﻿using BinaryLibs.Utils;
+﻿using AgeLib.AiModule.Engine.UP15;
+using BinaryLibs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace AgeLib.AiModule.Engine;
 public static class Receiver
 {
     private static string Folder { get; } = Path.GetDirectoryName(Environment.ProcessPath) ?? throw new Exception();
-    private static ExpertEngine Engine { get; } = new();
+    private static Engine15 Engine { get; } = new();
     private static Dictionary<int, IBot> Bots { get; } = [];
 
     static Receiver()
@@ -21,12 +22,12 @@ public static class Receiver
         Log.Shared.Information($"Folder: {Folder}");
     }
 
-    public static void Receive(IntPtr expert_ptr, IntPtr game_ptr)
+    public static void Receive(int version, IntPtr config)
     {
         try
         {
-            Log.Shared.Trace($"Received expert ptr {expert_ptr}");
-            var newgame = Engine.Initialize(expert_ptr, game_ptr);
+            Assert.That(version == 15);
+            var newgame = Engine.Initialize(config);
 
             if (newgame)
             {

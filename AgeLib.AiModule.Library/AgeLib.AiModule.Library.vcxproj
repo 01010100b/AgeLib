@@ -144,11 +144,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="v15.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgeLib.AiModule.Engine\AgeLib.AiModule.Engine.csproj">
       <Project>{cd71ccf3-ab19-4c6f-8d1c-dde5180f5b74}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="passthrough.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

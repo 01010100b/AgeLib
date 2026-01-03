@@ -18,7 +18,10 @@ internal class TestBot : IBot
             engine.Execute("set-goal", 171, 237);
             var val = engine.GetGoal(171);
         }
-        
+
         engine.Log($"time {sw.Elapsed}");
+        engine.Log($"goal 171 = {engine.GetGoal(171)}");
+        engine.SetCustomString($"my custom string {Random.Shared.Next(1000)}");
+        engine.Execute("chat-to-all", IEngine.CUSTOM_STRING_ID);
     }
 }
