@@ -39,7 +39,7 @@ internal class Program
         Thread.Sleep(5000);
 
         var deimos = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Deimos.dll");
-        var players = new Dictionary<int, string>() { { 2, deimos } };
+        var players = new Dictionary<int, string>() { { 1, deimos } };
         var config = Path.Combine(WK_FOLDER, "agelib-ai-module.config");
         File.Delete(config);
         File.WriteAllText(config, JsonConvert.SerializeObject(players, Formatting.Indented));

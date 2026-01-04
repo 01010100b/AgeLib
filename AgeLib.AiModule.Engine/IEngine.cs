@@ -38,5 +38,9 @@ public interface IEngine
     public void ChatDataToAll(string str, int type_op, int value);
     public void ChatDataToPlayer(int player, string str, int type_op, int value);
 
+    public int GetFact(int player, FactId fact, int parameter = 0);
+    public int GetObjectData(ObjectData data);
+    public void FindUnits(int player, ObjectStatus status, ObjectList list, List<int> ids);
+
     public void Log(string message);
 }

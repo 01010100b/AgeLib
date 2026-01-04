@@ -12,6 +12,7 @@ namespace AgeLib.AiModule.Engine;
 internal abstract class EngineBase : IEngine
 {
     private const int CUSTOM_STRING_ID = 89733;
+    private const int TEMP_GOAL = 123;
 
     public abstract int Version { get; }
     public int MyPlayer { get; internal set; } = -1;
@@ -115,6 +116,52 @@ internal abstract class EngineBase : IEngine
     {
         SetCustomString(str);
         Execute("up-chat-data-to-player", player, CUSTOM_STRING_ID, type_op, value);
+    }
+
+    public int GetFact(int player, FactId fact, int parameter = 0)
+    {
+        Assert.That(player >= 0 && player <= 8);
+
+        Execute("up-get-player-fact", player, (int)fact, parameter, TEMP_GOAL);
+
+        return GetGoal(TEMP_GOAL);
+    }
+
+    public int GetObjectData(ObjectData data)
+    {
+        Execute("up-get-object-data", (int)data, TEMP_GOAL);
+
+        return GetGoal(TEMP_GOAL);
+    }
+
+    public void FindUnits(int player, ObjectStatus status, ObjectList list, List<int> ids)
+    {
+        Assert.That(player >= 0 && player <= 8);
+
+        SetStrategicNumber(StrategicNumber.FOCUS_PLAYER_NUMBER, player);
+        Execute("up-full-reset-search");
+        Execute("up-filter-status", TypeOp.C, (int)status, TypeOp.C, (int)list);
+
+        while (true)
+        {
+            Execute("up-reset-search", 0, 0, 0, 1);
+            Execute("up-find-status-remote", TypeOp.C, -1, TypeOp.C, 40);
+            Execute("up-get-search-state", TEMP_GOAL);
+            var remote = GetGoal(TEMP_GOAL + 2);
+
+            if (remote == 0)
+            {
+                break;
+            }
+
+            for (int i = 0; i < remote; i++)
+            {
+                Execute("up-set-target-object", (int)SearchSource.REMOTE, TypeOp.C, i);
+                Execute("up-get-object-data", (int)ObjectData.ID, TEMP_GOAL);
+                var id = GetGoal(TEMP_GOAL);
+                ids.Add(id);
+            }
+        }
     }
 
     public void Log(string message)

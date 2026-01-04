@@ -91,7 +91,7 @@ internal class Engine15 : EngineBase
                         }
 
                     }
-                    else if (type == 3)
+                    else if (type == 3 && name != "up-get-object-data")
                     {
                         var function = (IntPtr)expert.Facts[node->Id].Ptr;
                         var argc = expert.Facts[node->Id].Argc;

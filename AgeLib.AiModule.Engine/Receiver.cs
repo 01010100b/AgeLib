@@ -87,6 +87,6 @@ public static class Receiver
             return;
         }
 
-        bot.Tick(Engine);
+        bot.Update(Engine);
     }
 }

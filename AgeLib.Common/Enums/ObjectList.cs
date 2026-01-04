@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AgeLib.AiModule.Engine;
+namespace AgeLib.Common.Enums;
 
-public interface IBot
+public enum ObjectList
 {
-    public void Update(IEngine engine);
+    ACTIVE, INACTIVE
 }
