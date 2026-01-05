@@ -12,9 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AgeLib.Scripting.Assembly\AgeLib.Scripting.Assembly.csproj" />
-    <ProjectReference Include="..\AgeLib.Scripting.Compilation\AgeLib.Scripting.Compilation.csproj" />
-    <ProjectReference Include="..\AgeLib.Scripting.Script\AgeLib.Scripting.Script.csproj" />
     <ProjectReference Include="..\Deimos\Deimos.csproj" />
   </ItemGroup>
 

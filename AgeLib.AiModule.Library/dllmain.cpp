@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <detours\detours.h>
 
+static const int CUSTOM_STRING_ID = 89733;
+
 namespace Passthrough
 {
 	using namespace System;
@@ -26,7 +28,6 @@ namespace V15
 	static Config config;
 	inline static char custom_string[256] = { };
 
-	static const int CUSTOM_STRING_ID = 89733;
 	static const uintptr_t GAME_ADDR = 0x7912A0;
 	static const uintptr_t FUNC_RUN_LIST_ADDR = 0x5F9C10;
 	static const uintptr_t FUNC_GET_STRING_ADDR = 0x5F9950;

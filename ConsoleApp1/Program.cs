@@ -1,8 +1,4 @@
-﻿using AgeLib.Scripting.Assembly;
-using AgeLib.Scripting.Compilation;
-using AgeLib.Scripting.Script;
-using AgeLib.Scripting.Script.Expressions;
-using BinaryLibs.Utils;
+﻿using BinaryLibs.Utils;
 using Newtonsoft.Json;
 using Reloaded.Injector;
 using System.Diagnostics;
@@ -23,6 +19,8 @@ internal class Program
 
     static void Main(string[] args)
     {
+        Console.WriteLine(Random.Shared.Next());
+        return;
         FileSystem.CopyDirectory(LIB_FOLDER, WK_FOLDER);
         FileSystem.CopyDirectory(ENGINE_FOLDER, WK_FOLDER);
 

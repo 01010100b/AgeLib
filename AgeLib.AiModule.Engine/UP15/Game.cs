@@ -10,8 +10,6 @@ namespace AgeLib.AiModule.Engine.UP15;
 [StructLayout(LayoutKind.Sequential)]
 internal unsafe struct Game
 {
-    public const int ADDR = 0x7912A0;
-
     private fixed byte Unknown0[40];
     public readonly void* ProgramInformation;
     private fixed byte Unknown1[436];

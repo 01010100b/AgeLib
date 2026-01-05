@@ -43,6 +43,11 @@ public class Bot : IBot
                 }
             }
         }
+
+        foreach (var player in Players)
+        {
+            player.Update(Engine);
+        }
     }
 
     private void UpdateUnits()

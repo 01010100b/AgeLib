@@ -35,7 +35,7 @@ internal class Engine15 : EngineBase
         unsafe
         {
             var expert = Marshal.PtrToStructure<AiExpert>(ExpertPtr);
-            var has_symbol = false;
+            var first_init = false;
 
             for (int table = 0; table < expert.GlobalSymbolTableSize; table++)
             {
@@ -49,7 +49,7 @@ internal class Engine15 : EngineBase
 
                         if (name == "UP-AVAILABLE")
                         {
-                            has_symbol = true;
+                            first_init = true;
 
                             break;
                         }
@@ -58,13 +58,13 @@ internal class Engine15 : EngineBase
                     node = node->Next;
                 }
 
-                if (has_symbol)
+                if (first_init)
                 {
                     break;
                 }
             }
 
-            if (!has_symbol)
+            if (!first_init)
             {
                 return false;
             }

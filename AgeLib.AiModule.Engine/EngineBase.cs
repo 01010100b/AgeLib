@@ -114,6 +114,8 @@ internal abstract class EngineBase : IEngine
 
     public void ChatDataToPlayer(int player, string str, int type_op, int value)
     {
+        Assert.That(player >= 0 && player <= 8);
+
         SetCustomString(str);
         Execute("up-chat-data-to-player", player, CUSTOM_STRING_ID, type_op, value);
     }
@@ -149,17 +151,17 @@ internal abstract class EngineBase : IEngine
             Execute("up-get-search-state", TEMP_GOAL);
             var remote = GetGoal(TEMP_GOAL + 2);
 
-            if (remote == 0)
-            {
-                break;
-            }
-
             for (int i = 0; i < remote; i++)
             {
                 Execute("up-set-target-object", (int)SearchSource.REMOTE, TypeOp.C, i);
                 Execute("up-get-object-data", (int)ObjectData.ID, TEMP_GOAL);
                 var id = GetGoal(TEMP_GOAL);
                 ids.Add(id);
+            }
+
+            if (remote < 40)
+            {
+                break;
             }
         }
     }
