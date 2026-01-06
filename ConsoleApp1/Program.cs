@@ -14,18 +14,16 @@ internal class Program
     private const string CONFIG = "Release";
 #endif
     private const string WK_FOLDER = @"F:\AoE\WK\Age2_x1";
-    private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Library\dist\{CONFIG}";
-    private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.AiModule.Engine\bin\{CONFIG}\net8.0";
+    private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Library\dist\{CONFIG}";
+    private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Engine\bin\{CONFIG}\net8.0";
 
     static void Main(string[] args)
     {
-        Console.WriteLine(Random.Shared.Next());
-        return;
         FileSystem.CopyDirectory(LIB_FOLDER, WK_FOLDER);
         FileSystem.CopyDirectory(ENGINE_FOLDER, WK_FOLDER);
 
         var wk = Path.Combine(WK_FOLDER, "WK.exe");
-        var dll = Path.Combine(WK_FOLDER, "AgeLib.AiModule.Library.dll");
+        var dll = Path.Combine(WK_FOLDER, "AgeLib.Library.dll");
         var info = new ProcessStartInfo(wk);
         var process = Process.Start(info)!;
         process.WaitForInputIdle();
@@ -38,7 +36,7 @@ internal class Program
 
         var deimos = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Deimos.dll");
         var players = new Dictionary<int, string>() { { 1, deimos } };
-        var config = Path.Combine(WK_FOLDER, "agelib-ai-module.config");
+        var config = Path.Combine(WK_FOLDER, "agelib-engine.config");
         File.Delete(config);
         File.WriteAllText(config, JsonConvert.SerializeObject(players, Formatting.Indented));
     }

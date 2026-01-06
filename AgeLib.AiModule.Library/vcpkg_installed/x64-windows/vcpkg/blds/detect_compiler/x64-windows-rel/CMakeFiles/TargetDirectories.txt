@@ -1,2 +1,0 @@
-F:/Repos/01010100b/AgeLib/AgeLib.AiModule.Library/vcpkg_installed/x64-windows/vcpkg/blds/detect_compiler/x64-windows-rel/CMakeFiles/edit_cache.dir
-F:/Repos/01010100b/AgeLib/AgeLib.AiModule.Library/vcpkg_installed/x64-windows/vcpkg/blds/detect_compiler/x64-windows-rel/CMakeFiles/rebuild_cache.dir

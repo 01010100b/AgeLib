@@ -1,0 +1,92 @@
+﻿using AgeLib.Engine.UP15;
+using BinaryLibs.Utils;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AgeLib.Engine;
+
+public static class Receiver
+{
+    private static string Folder { get; } = Path.GetDirectoryName(Environment.ProcessPath) ?? throw new Exception();
+    private static EngineBase Engine { get; set; } = new Engine15();
+    private static Dictionary<int, IBot> Bots { get; } = [];
+
+    static Receiver()
+    {
+        var file = Path.Combine(Folder, "agelib-engine.log");
+        Log.Shared.AddFileListener(file);
+        Log.Shared.Information($"Folder: {Folder}");
+    }
+
+    public static void Receive(int version, IntPtr config)
+    {
+        try
+        {
+            if (version != Engine.Version)
+            {
+                Engine = version switch
+                {
+                    15 => new Engine15(),
+                    _ => throw new NotSupportedException($"Version {version} is not supported.")
+                };
+            }
+
+            var newgame = Engine.Initialize(config);
+
+            if (newgame)
+            {
+                StartNewGame();
+            }
+            else
+            {
+                Tick();
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Shared.Exception(e);
+        }
+    }
+
+    private static void StartNewGame()
+    {
+        Log.Shared.Information($"Starting new game");
+
+        Bots.Clear();
+        var file = Path.Combine(Folder, "agelib-engine.config");
+        var players = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(file)) ?? throw new Exception();
+        
+        foreach (var player in players)
+        {
+            var bot = Loader.Create(player.Value);
+            Bots.Add(player.Key, bot);
+        }
+    }
+
+    private static void Tick()
+    {
+        Engine.MyPlayer = -1;
+
+        for (int i = 1; i <= 8; i++)
+        {
+            if (Engine.Execute("player-number", i) == 1)
+            {
+                Engine.MyPlayer = i;
+
+                break;
+            }
+        }
+
+        if (Engine.MyPlayer == -1 || !Bots.TryGetValue(Engine.MyPlayer, out var bot))
+        {
+            return;
+        }
+
+        bot.Update(Engine);
+    }
+}
