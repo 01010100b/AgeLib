@@ -1,4 +1,5 @@
-﻿using AgeLib.Common.Enums;
+﻿using AgeLib.Common;
+using AgeLib.Common.Enums;
 using AgeLib.Common.Types;
 using BinaryLibs.Utils;
 using System;

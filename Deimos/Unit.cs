@@ -1,11 +1,11 @@
-﻿using AgeLib.Engine;
-using AgeLib.Common.Enums;
+﻿using AgeLib.Common.Enums;
 using AgeLib.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AgeLib.Common;
 
 namespace Deimos;
 
@@ -19,6 +19,7 @@ internal class Unit
     public int BaseType { get; private set; } = -2;
     public int UpogradeType { get; private set; } = -2;
     public Point PrecisePosition { get; private set; }
+    public double Speed { get; private set; } = 0;
     public int TargetId { get; private set; } = -1;
 
     public Unit(int id, Bot bot)
@@ -51,6 +52,7 @@ internal class Unit
         var x = engine.GetObjectData(ObjectData.PRECISE_X);
         var y = engine.GetObjectData(ObjectData.PRECISE_Y);
         PrecisePosition = new Point(x, y);
+        Speed = engine.GetObjectData(ObjectData.SPEED) / 100d;
         TargetId = engine.GetObjectData(ObjectData.TARGET_ID);
 
         return;
