@@ -75,7 +75,7 @@ internal class Production
 
     public void Produce(IEngine engine)
     {
-        int GOAL = 100;
+        const int GOAL = 100;
 
         if (Commands.Count == 0)
         {

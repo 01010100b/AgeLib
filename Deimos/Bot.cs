@@ -14,8 +14,10 @@ public class Bot : IBot
     internal IEngine Engine => CurrentEngine!;
     internal int Tick { get; private set; } = 0;
     internal TimeSpan GameTime { get; private set; } = TimeSpan.Zero;
-    internal List<Player> Players { get; } = [];
+    internal Map Map { get; } = new();
+    internal Town Town { get; } = new();
     internal Production Production { get; } = new();
+    internal List<Player> Players { get; } = [];
 
     private IEngine? CurrentEngine { get; set; } = null;
     private Dictionary<int, Unit> Units { get; } = [];
@@ -26,9 +28,13 @@ public class Bot : IBot
         CurrentEngine = engine;
         Tick++;
         GameTime = TimeSpan.FromSeconds(engine.GetFact(engine.MyPlayer, FactId.GAME_TIME, 0));
+        Map.Update(engine);
+        Town.Update(engine);
 
         UpdatePlayers();
         UpdateUnits();
+
+        Production.Produce(engine);
 
         engine.ChatToAll($"I am Deimos {Random.Shared.Next(1000)}");
         engine.ChatToAll($"Took {sw.Elapsed.TotalMilliseconds:N2} ms");
@@ -89,7 +95,7 @@ public class Bot : IBot
             player.Units.Clear();
             ids.Clear();
 
-            Engine.FindUnits(player.Id, ObjectStatus.READY, ObjectList.ACTIVE, ids);
+            Engine.FindUnits(player.Id, ObjectStatus.READY, ObjectList.ACTIVE, ids);        
 
             foreach (var id in ids)
             {

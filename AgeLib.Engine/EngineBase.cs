@@ -5,6 +5,7 @@ using BinaryLibs.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -148,7 +149,7 @@ internal abstract class EngineBase : IEngine
         while (true)
         {
             Execute("up-reset-search", 0, 0, 0, 1);
-            Execute("up-find-status-remote", TypeOp.C, -1, TypeOp.C, 40);
+            Execute("up-find-status-remote", TypeOp.C, -1, TypeOp.C, Constants.MAX_REMOTE_SEARCH);
             Execute("up-get-search-state", TEMP_GOAL);
             var remote = GetGoal(TEMP_GOAL + 2);
 
