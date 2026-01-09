@@ -36,7 +36,7 @@ internal class Town
             return engine.GetGoal(105);
         }
 
-        engine.Execute("full-reset-search");
+        engine.Execute("up-full-reset-search");
         engine.Execute("up-find-local", TypeOp.C, Objects.TownCenter, TypeOp.C, Constants.MAX_LOCAL_SEARCH);
 
         if (results() == 0)

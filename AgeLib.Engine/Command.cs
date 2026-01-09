@@ -14,7 +14,6 @@ internal class Command
     public IntPtr Function { get; }
     public int Argc { get; }
     public bool IsFact { get; }
-    public int Calls { get; private set; } = 0;
 
     public Command(string name, IntPtr function, int argc, bool is_fact)
     {
@@ -30,8 +29,6 @@ internal class Command
 
     public int Execute(int arg1 = 0, int arg2 = 0, int arg3 = 0, int arg4 = 0)
     {
-        Calls++;
-
         unsafe
         {
             if (IsFact)
