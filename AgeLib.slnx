@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AgeLib.Common.Tests/AgeLib.Common.Tests.csproj" />
+  <Project Path="AgeLib.Common/AgeLib.Common.csproj" />
+  <Project Path="AgeLib.Engine.Tests/AgeLib.Engine.Tests.csproj" />
+  <Project Path="AgeLib.Engine/AgeLib.Engine.csproj" />
+  <Project Path="AgeLib.Library/AgeLib.Library.vcxproj">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="ConsoleApp1/ConsoleApp1.csproj" />
+  <Project Path="Deimos/Deimos.csproj" />
+</Solution>
