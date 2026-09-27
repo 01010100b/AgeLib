@@ -14,7 +14,7 @@ internal class Program
     private const string CONFIG = "Release";
 #endif
     private const string WK_FOLDER = @"F:\AoE\WK\Age2_x1";
-    private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.LegacyLibrary\dist\Win32\{CONFIG}";
+    private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Library\dist\{CONFIG}";
     private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Engine\bin\{CONFIG}\net10.0";
 
     static void Main(string[] args)
@@ -23,7 +23,7 @@ internal class Program
         FileSystem.CopyDirectory(ENGINE_FOLDER, WK_FOLDER);
 
         var wk = Path.Combine(WK_FOLDER, "WK.exe");
-        var dll = Path.Combine(WK_FOLDER, "AgeLib.LegacyLibrary.dll");
+        var dll = Path.Combine(WK_FOLDER, "AgeLib.Library.dll");
         var info = new ProcessStartInfo(wk);
         var process = Process.Start(info)!;
         process.WaitForInputIdle();
@@ -32,6 +32,13 @@ internal class Program
         using var injector = new Injector(process);
         var addr = injector.Inject(dll);
         Console.WriteLine($"addr {addr}");
+        var initialized = injector.CallFunction(dll, "Initialize", 0L);
+        Console.WriteLine($"initialized {initialized}");
+        if (initialized != 1)
+        {
+            throw new InvalidOperationException("AgeLib.Library failed to initialize its hooks.");
+        }
+
         Thread.Sleep(5000);
 
         var deimos = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Deimos.dll");

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <NativeLib>Shared</NativeLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishDir>$(MSBuildProjectDirectory)\dist\$(Configuration)\</PublishDir>
+    <VcpkgInstallRoot>$(MSBuildProjectDirectory)\vcpkg_installed</VcpkgInstallRoot>
+    <DetoursRoot>$(VcpkgInstallRoot)\x86-windows-static</DetoursRoot>
+    <DetoursLibraryDirectory Condition="'$(Configuration)' == 'Debug'">$(DetoursRoot)\debug\lib</DetoursLibraryDirectory>
+    <DetoursLibraryDirectory Condition="'$(Configuration)' != 'Debug'">$(DetoursRoot)\lib</DetoursLibraryDirectory>
+    <VsWherePath>$([System.Environment]::GetEnvironmentVariable('ProgramFiles(x86)'))\Microsoft Visual Studio\Installer\vswhere.exe</VsWherePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DirectPInvoke Include="detours" />
+    <LinkerArg Include="/LIBPATH:&quot;$(DetoursLibraryDirectory)&quot;" />
+    <LinkerArg Include="detours.lib" />
+    <ProjectReference Include="..\AgeLib.Engine\AgeLib.Engine.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="RestoreDetours" BeforeTargets="Build" Condition="!Exists('$(DetoursLibraryDirectory)\detours.lib')">
+    <Exec Command="&quot;$(VsWherePath)&quot; -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath" ConsoleToMSBuild="true" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_VisualStudioInstallPath" />
+    </Exec>
+    <PropertyGroup>
+      <_VcpkgExecutable Condition="Exists('$(VCPKG_ROOT)\vcpkg.exe')">$(VCPKG_ROOT)\vcpkg.exe</_VcpkgExecutable>
+      <_VcpkgExecutable Condition="'$(_VcpkgExecutable)' == ''">$(_VisualStudioInstallPath)\VC\vcpkg\vcpkg.exe</_VcpkgExecutable>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_VcpkgExecutable)')" Text="Install vcpkg with the Visual C++ build tools or set VCPKG_ROOT." />
+    <Exec Command="&quot;$(_VcpkgExecutable)&quot; install --triplet=x86-windows-static --x-manifest-root=&quot;$(MSBuildProjectDirectory)\vcpkg-manifest&quot; --x-install-root=&quot;$(VcpkgInstallRoot)&quot;" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+</Project>
