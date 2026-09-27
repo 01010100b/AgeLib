@@ -161,7 +161,7 @@ internal abstract class EngineBase : IEngine
                 ids.Add(id);
             }
 
-            if (remote < 40)
+            if (remote < Constants.MAX_REMOTE_SEARCH)
             {
                 break;
             }

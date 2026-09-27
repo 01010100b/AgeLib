@@ -23,6 +23,14 @@ public readonly struct Point(int x, int y)
     public Point ToPrecise() => new(X * 100, Y * 100);
     public Point FromPrecise() => new(X / 100, Y / 100);
 
+    public double DistanceTo(Point other)
+    {
+        var dx = X - other.X;
+        var dy = Y - other.Y;
+
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
     public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is Point p && X == p.X && Y == p.Y;
 

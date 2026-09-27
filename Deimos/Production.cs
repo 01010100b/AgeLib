@@ -12,14 +12,14 @@ namespace Deimos;
 
 internal class Production
 {
-    private class Command
+    private class Command(int priority, int blocking_permille, int id, Command.CommandType type)
     {
         public enum CommandType { RESEARCH, TRAIN, BUILD_NORMAL }
 
-        public required int Priority { get; set; }
-        public required int BlockingPermille { get; set; }
-        public required int Id { get; set; }
-        public required CommandType Type { get; set; }
+        public int Priority { get; } = priority;
+        public int BlockingPermille { get; } = Math.Clamp(blocking_permille, 0, 1000);
+        public int Id { get; } = id;
+        public CommandType Type { get; } = type;
 
         public void Execute(IEngine engine)
         {
@@ -41,52 +41,29 @@ internal class Production
     private List<Command> Commands { get; } = [];
 
     public void Research(int id, int priority, int blocking_permille)
-    {
-        Commands.Add(new()
-        {
-            Priority = priority,
-            BlockingPermille = blocking_permille,
-            Id = id,
-            Type = Command.CommandType.RESEARCH
-        });
-    }
+        => Commands.Add(new(priority, blocking_permille, id, Command.CommandType.RESEARCH));
 
     public void Train(int id , int priority, int blocking_permille)
-    {
-        Commands.Add(new()
-        {
-            Priority = priority,
-            BlockingPermille = blocking_permille,
-            Id = id,
-            Type = Command.CommandType.TRAIN
-        });
-    }
+        => Commands.Add(new(priority, blocking_permille, id, Command.CommandType.TRAIN));
 
     public void BuildNormal(int id, int priority, int blocking_permille)
-    {
-        Commands.Add(new()
-        {
-            Priority = priority,
-            BlockingPermille = blocking_permille,
-            Id = id,
-            Type = Command.CommandType.BUILD_NORMAL
-        });
-    }
+        => Commands.Add(new(priority, blocking_permille, id, Command.CommandType.BUILD_NORMAL));
 
     public void Produce(IEngine engine)
     {
-        const int GOAL = 100;
-
         if (Commands.Count == 0)
         {
             return;
         }
+
+        const int GOAL = 100;
 
         var food = engine.GetFact(engine.MyPlayer, FactId.FOOD_AMOUNT);
         var wood = engine.GetFact(engine.MyPlayer, FactId.WOOD_AMOUNT);
         var stone = engine.GetFact(engine.MyPlayer, FactId.STONE_AMOUNT);
         var gold = engine.GetFact(engine.MyPlayer, FactId.GOLD_AMOUNT);
         var res = new Cost(food, wood, stone, gold);
+        var is_researching = false;
         engine.Execute("up-setup-cost-data", 1, GOAL);
         Commands.Sort((a, b) => b.Priority.CompareTo(a.Priority));
 
@@ -111,6 +88,11 @@ internal class Production
             {
                 command.Execute(engine);
                 res -= cost;
+
+                if (command.Type == Command.CommandType.RESEARCH)
+                {
+                    is_researching = true;
+                }
             }
             else if (command.BlockingPermille > 0)
             {
@@ -120,5 +102,14 @@ internal class Production
         }
 
         Commands.Clear();
+
+        if (is_researching)
+        {
+            engine.SetStrategicNumber(StrategicNumber.ENABLE_TRAINING_QUEUE, 0);
+        }
+        else
+        {
+            engine.SetStrategicNumber(StrategicNumber.ENABLE_TRAINING_QUEUE, 1);
+        }
     }
 }

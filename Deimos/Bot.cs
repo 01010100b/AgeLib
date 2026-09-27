@@ -11,7 +11,6 @@ namespace Deimos;
 
 public class Bot : IBot
 {
-    internal IEngine Engine => CurrentEngine!;
     internal int Tick { get; private set; } = 0;
     internal TimeSpan GameTime { get; private set; } = TimeSpan.Zero;
     internal Map Map { get; } = new();
@@ -19,20 +18,18 @@ public class Bot : IBot
     internal Production Production { get; } = new();
     internal List<Player> Players { get; } = [];
 
-    private IEngine? CurrentEngine { get; set; } = null;
     private Dictionary<int, Unit> Units { get; } = [];
 
     public void Update(IEngine engine)
     {
         var sw = Stopwatch.StartNew();
-        CurrentEngine = engine;
         Tick++;
-        GameTime = TimeSpan.FromSeconds(engine.GetFact(engine.MyPlayer, FactId.GAME_TIME, 0));
+        GameTime = TimeSpan.FromSeconds(engine.GetFact(engine.MyPlayer, FactId.GAME_TIME));
         Map.Update(engine);
         Town.Update(engine);
 
-        UpdatePlayers();
-        UpdateUnits();
+        UpdatePlayers(engine);
+        UpdateUnits(engine);
 
         Production.Produce(engine);
 
@@ -40,26 +37,26 @@ public class Bot : IBot
         engine.ChatToAll($"Took {sw.Elapsed.TotalMilliseconds:N2} ms");
     }
 
-    private void UpdatePlayers()
+    private void UpdatePlayers(IEngine engine)
     {
         if (Players.Count == 0)
         {
             for (int i = 0; i <= 8; i++)
             {
-                if (Engine.Check("player-valid", i))
+                if (engine.Check("player-valid", i))
                 {
-                    Players.Add(new(i, Engine));
+                    Players.Add(new(i, engine));
                 }
             }
         }
 
         foreach (var player in Players)
         {
-            player.Update(Engine);
+            player.Update(engine);
         }
     }
 
-    private void UpdateUnits()
+    private void UpdateUnits(IEngine engine)
     {
         const int MAX_UPDATES = 20;
 
@@ -82,12 +79,12 @@ public class Bot : IBot
 
                 if (unit.Speed != 0 && units < MAX_UPDATES)
                 {
-                    unit.Update(this);
+                    unit.Update(this, engine);
                     units++;
                 }
                 else if (unit.Speed == 0 && buildings < MAX_UPDATES)
                 {
-                    unit.Update(this);
+                    unit.Update(this, engine);
                     buildings++;
                 }
             }
@@ -95,13 +92,13 @@ public class Bot : IBot
             player.Units.Clear();
             ids.Clear();
 
-            Engine.FindUnits(player.Id, ObjectStatus.READY, ObjectList.ACTIVE, ids);        
+            engine.FindUnits(player.Id, ObjectStatus.READY, ObjectList.ACTIVE, ids);        
 
             foreach (var id in ids)
             {
                 if (!Units.ContainsKey(id))
                 {
-                    Units.Add(id, new(id, this));
+                    Units.Add(id, new(id, this, engine));
                 }
             }
         }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AgeLib.Common;
+using AgeLib.Engine;
 
 namespace Deimos;
 
@@ -22,13 +23,13 @@ internal class Unit
     public double Speed { get; private set; } = 0;
     public int TargetId { get; private set; } = -1;
 
-    public Unit(int id, Bot bot)
+    public Unit(int id, Bot bot, IEngine engine)
     {
         Id = id;
-        Update(bot);
+        Update(bot, engine);
     }
 
-    public void Update(Bot bot)
+    public void Update(Bot bot, IEngine engine)
     {
         if (LastUpdateTick == bot.Tick)
         {
@@ -37,7 +38,6 @@ internal class Unit
 
         LastUpdateTick = bot.Tick;
         LastUpdateGameTime = bot.GameTime;
-        var engine = bot.Engine;
 
         if (!engine.Check("up-set-target-by-id", TypeOp.C, Id))
         {
