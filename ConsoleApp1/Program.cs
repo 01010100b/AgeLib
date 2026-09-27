@@ -15,7 +15,7 @@ internal class Program
 #endif
     private const string WK_FOLDER = @"F:\AoE\WK\Age2_x1";
     private const string LIB_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Library\dist\Win32\{CONFIG}";
-    private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Engine\bin\{CONFIG}\net8.0";
+    private const string ENGINE_FOLDER = @$"F:\Repos\01010100b\AgeLib\AgeLib.Engine\bin\{CONFIG}\net10.0";
 
     static void Main(string[] args)
     {

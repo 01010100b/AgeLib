@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -9,11 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BinaryLibs.Utils" Version="0.118.0" />
+    <PackageReference Include="BinaryLibs.Utils" Version="0.166.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AgeLib.Common\AgeLib.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AgeLib.Engine.Tests" />
   </ItemGroup>
 
 </Project>
