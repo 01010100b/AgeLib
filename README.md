@@ -8,14 +8,14 @@ It works by injecting a native DLL into the running game process, hooking the ga
 
 ```mermaid
 flowchart LR
-    A[Game process<br/>Age2_x1.exe] -- Detours hook --> B[AgeLib.Library<br/>native DLL]
+    A[Game process<br/>Age2_x1.exe] -- x86 inline hook --> B[AgeLib.Library<br/>native DLL]
     B -- hostfxr / CoreCLR --> C[AgeLib.Engine<br/>Receiver.Receive]
     C -- per-player tick --> D[Your bot DLL<br/>implements IBot]
     D -- IEngine calls --> C
 ```
 
 1. **Injection** — A native DLL (`AgeLib.Library`) is injected into the game process (e.g. via [Reloaded.Injector](https://github.com/Reloaded-Project/Reloaded.Injector)) and its exported `Initialize` function is invoked.
-2. **Hooking** — `AgeLib.Library` is a C# project compiled with **Native AOT** into a native shared library (`NativeLib=Shared`). It links against [Detours](https://github.com/microsoft/Detours) (via vcpkg, as a static lib) and uses it, through `[UnmanagedCallersOnly]` function pointers, to hook the game's internal AI rule-list and get-string functions. On every AI tick for every player, the hook captures pointers to the live AI expert/game/custom-string state.
+2. **Hooking** — `AgeLib.Library` is a C# project compiled with **Native AOT** into a native shared library (`NativeLib=Shared`). By default it links against [Detours](https://github.com/microsoft/Detours) (via vcpkg, as a static lib). The `ExperimentalHooks` project property selects a direct x86 inline-hook implementation instead; that path uses Iced to decode instruction boundaries and refuses prologues containing control-flow instructions. Both paths use `[UnmanagedCallersOnly]` function pointers to hook the game's internal AI rule-list and get-string functions. On every AI tick for every player, the hook captures pointers to the live AI expert/game/custom-string state.
 3. **Managed hosting** — `AgeLib.Library` hosts a *second*, separate CoreCLR runtime directly via `hostfxr` (its own AOT runtime cannot run arbitrary managed assemblies) and binds to a single managed entry point, `AgeLib.Engine.Receiver.Receive(int version, IntPtr config)`, exported from `AgeLib.Engine` via `[UnmanagedCallersOnly]`.
 4. **Engine dispatch** — `Receiver` detects new games (reloading `agelib-engine.config`), figures out which player the current call belongs to, and calls `bot.Update(engine)` on the `IBot` configured for that player.
 5. **Bot logic** — Your bot implements `IBot.Update(IEngine engine)` and uses the `IEngine` API to read/write goals, strategic numbers, facts, and unit data, and to issue chat/commands, exactly as an in-game AI script would.
@@ -24,7 +24,7 @@ flowchart LR
 
 | Project | Purpose |
 |---|---|
-| `AgeLib.Library` | C# project published with Native AOT to a native shared library (win-x86). Installs the Detours hook, hosts a separate CoreCLR via hostfxr, and forwards ticks into `AgeLib.Engine.Receiver.Receive`. Win32/x86 only (matches the game's process architecture). |
+| `AgeLib.Library` | C# project published with Native AOT to a native shared library (win-x86). Installs the configured hook implementation, hosts a separate CoreCLR via hostfxr, and forwards ticks into `AgeLib.Engine.Receiver.Receive`. Win32/x86 only (matches the game's process architecture). |
 | `AgeLib.Engine` | Managed engine. `Receiver` is the native entry point; `EngineBase`/`Engine15` (in `UP15/`) adapt the game's live AI expert state (version 15 only, via reflection over hard-coded native offsets/structs) to the `IEngine` interface; `Loader` loads bot assemblies in isolated `AssemblyLoadContext`s. |
 | `AgeLib.Common` | Shared enums (`Enums/`) and value types (`Types/`: `Cost`, `Point`, `SearchState`) used by both the engine and bots. |
 | `Deimos` | Sample bot implementing `IBot`, showing map/town/unit/production tracking against the `IEngine` API. |
@@ -97,7 +97,8 @@ Update the hard-coded paths at the top of [ConsoleApp1/Program.cs](ConsoleApp1/P
 
 ## Building
 
-- Requires the .NET SDK version pinned in [global.json](global.json), and a Visual Studio C++ toolset with vcpkg for the Detours dependency (needed to link `AgeLib.Library`, even though it's C#).
+- Requires the .NET SDK version pinned in [global.json](global.json). The default Detours build also needs a Visual Studio C++ toolset with vcpkg; the experimental direct-hook build does not.
 - Managed projects (`AgeLib.Engine`, `AgeLib.Common`, bots, tests) build with the standard `dotnet build`.
 - `AgeLib.Library` is a Native AOT project (`PublishAot`, `RuntimeIdentifier=win-x86`); build its native output with `dotnet publish`, not `dotnet build`. Output goes to `AgeLib.Library/dist/<Configuration>`.
+- To test direct hooks, set `<ExperimentalHooks>true</ExperimentalHooks>` in `AgeLib.Library/AgeLib.Library.csproj` and publish again. The experimental build does not link or restore Detours; set the property back to `false` to use the existing Detours implementation. Unsupported prologues cause initialization to fail rather than being patched.
 - Tests use xunit.v3 with the Microsoft.Testing.Platform runner (opted in via `global.json`); run with `dotnet test --project <csproj>` rather than plain `dotnet test <csproj>`.
