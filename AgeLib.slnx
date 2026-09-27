@@ -9,9 +9,6 @@
   <Project Path="AgeLib.Engine.Tests/AgeLib.Engine.Tests.csproj" />
   <Project Path="AgeLib.Engine/AgeLib.Engine.csproj" />
   <Project Path="AgeLib.Library/AgeLib.Library.csproj" />
-  <Project Path="AgeLib.LegacyLibrary/AgeLib.LegacyLibrary.vcxproj">
-    <Platform Solution="*|Any CPU" Project="Win32" />
-  </Project>
   <Project Path="ConsoleApp1/ConsoleApp1.csproj" />
   <Project Path="Deimos/Deimos.csproj" />
 </Solution>
