@@ -23,7 +23,7 @@
     <EnableManagedPackageReferenceSupport>true</EnableManagedPackageReferenceSupport>
     <ProjectGuid>{2B059CAF-F309-215F-9B7D-C0E1882F792A}</ProjectGuid>
     <Keyword>NetCoreCProj</Keyword>
-    <RootNamespace>AgeLibLibrary</RootNamespace>
+    <RootNamespace>AgeLibLegacyLibrary</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <TargetFramework>net10.0</TargetFramework>
     <WindowsTargetPlatformMinVersion>7.0</WindowsTargetPlatformMinVersion>
