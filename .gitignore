@@ -192,6 +192,10 @@ publish/
 # in these scripts will be unencrypted
 PublishScripts/
 
+# vcpkg manifest-mode build output
+vcpkg_installed/
+[Dd]ist/
+
 # NuGet Packages
 *.nupkg
 # NuGet Symbol Packages

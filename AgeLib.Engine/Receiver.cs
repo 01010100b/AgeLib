@@ -1,10 +1,12 @@
-﻿using AgeLib.Engine.UP15;
+﻿
+using AgeLib.Engine.UP15;
 using BinaryLibs.Utils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +25,7 @@ public static class Receiver
         Log.Shared.Information($"Folder: {Folder}");
     }
 
+    [UnmanagedCallersOnly(EntryPoint = "Receive")]
     public static void Receive(int version, IntPtr config)
     {
         try

@@ -11,6 +11,9 @@
   <Project Path="AgeLib.LegacyLibrary/AgeLib.LegacyLibrary.vcxproj">
     <Platform Solution="*|Any CPU" Project="Win32" />
   </Project>
+  <Project Path="AgeLib.Library/AgeLib.Library.vcxproj">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
   <Project Path="ConsoleApp1/ConsoleApp1.csproj" />
   <Project Path="Deimos/Deimos.csproj" />
 </Solution>
