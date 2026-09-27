@@ -29,13 +29,12 @@ internal static unsafe class ModuleStartup
         FuncGetString = Translate(FuncGetStringAddress);
         LibraryLog.Write($"Hook targets translated. Game=0x{(nuint)ConfigPointer->GamePtr:X}, RunList=0x{(nuint)FuncRunList:X}, GetString=0x{(nuint)FuncGetString:X}.");
 
-#if EXPERIMENTAL_HOOKS
         var run_list_detour = (nint)(delegate* unmanaged[Thiscall]<nint, int, nint, int>)&DetouredRunList;
         var get_string_detour = (nint)(delegate* unmanaged[Thiscall]<nint, int, byte*>)&DetouredGetString;
         var run_list_status = NativeDetour.TryInstall(FuncRunList, run_list_detour, out var run_list_trampoline, out var run_list_length);
         if (!run_list_status)
         {
-            LibraryLog.Write("Experimental run-list hook installation failed.");
+            LibraryLog.Write("Run-list hook installation failed.");
             return false;
         }
 
@@ -45,28 +44,14 @@ internal static unsafe class ModuleStartup
         {
             var run_list_rolled_back = NativeDetour.TryRemove(Translate(FuncRunListAddress), run_list_trampoline, run_list_length);
             LibraryLog.Write(run_list_rolled_back
-                ? "Experimental get-string hook installation failed; run-list hook rolled back."
-                : "Experimental get-string hook installation failed; run-list rollback failed and its hook remains active.");
+                ? "Get-string hook installation failed; run-list hook rolled back."
+                : "Get-string hook installation failed; run-list rollback failed and its hook remains active.");
             return false;
         }
 
         FuncGetString = get_string_trampoline;
-        LibraryLog.Write($"Experimental hooks installed. RunListTrampoline=0x{(nuint)FuncRunList:X}, GetStringTrampoline=0x{(nuint)FuncGetString:X}.");
+        LibraryLog.Write($"Hooks installed. RunListTrampoline=0x{(nuint)FuncRunList:X}, GetStringTrampoline=0x{(nuint)FuncGetString:X}.");
         return true;
-#else
-        var begin_status = NativeMethods.DetourTransactionBegin();
-        var update_status = NativeMethods.DetourUpdateThread(NativeMethods.GetCurrentThread());
-        var run_list_status = NativeMethods.DetourAttach(ref FuncRunList, (nint)(delegate* unmanaged[Thiscall]<nint, int, nint, int>)&DetouredRunList);
-        var get_string_status = NativeMethods.DetourAttach(ref FuncGetString, (nint)(delegate* unmanaged[Thiscall]<nint, int, byte*>)&DetouredGetString);
-        var commit_status = NativeMethods.DetourTransactionCommit();
-        LibraryLog.Write($"Detours results: begin={begin_status}, updateThread={update_status}, attachRunList={run_list_status}, attachGetString={get_string_status}, commit={commit_status}.");
-
-        return begin_status == 0
-            && update_status == 0
-            && run_list_status == 0
-            && get_string_status == 0
-            && commit_status == 0;
-#endif
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvThiscall)])]
