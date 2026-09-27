@@ -28,7 +28,14 @@
     <TargetFramework>net10.0</TargetFramework>
     <WindowsTargetPlatformMinVersion>7.0</WindowsTargetPlatformMinVersion>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(MSBuildToolsPath)\Sdks\Microsoft.NET.Sdk\Sdk\Sdk.props" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
+  <PropertyGroup Condition="'$(MSBuildRuntimeType)' == 'Core'">
+    <_DotNetAppHostPackVersion>@(KnownAppHostPack-&gt;WithMetadataValue('TargetFramework', '$(TargetFramework)')-&gt;'%(AppHostPackVersion)')</_DotNetAppHostPackVersion>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(MSBuildRuntimeType)' == 'Core'">
+    <PackageDownload Include="Microsoft.NETCore.App.Host.win-x86" Version="[$(_DotNetAppHostPackVersion)]" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" Condition="'$(MSBuildRuntimeType)' != 'Core'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -57,7 +64,7 @@
     <CLRSupport>NetCore</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" Condition="'$(MSBuildRuntimeType)' != 'Core'" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -155,7 +162,9 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" Condition="'$(MSBuildRuntimeType)' != 'Core'" />
+  <Import Project="$(MSBuildToolsPath)\Sdks\Microsoft.NET.Sdk\Sdk\Sdk.targets" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
+  <Import Project="DotNetNativeBuild.targets" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

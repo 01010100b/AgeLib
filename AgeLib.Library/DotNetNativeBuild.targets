@@ -1,0 +1,71 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_DotNetNativePlatform Condition="'$(Platform)' == '' or '$(Platform)' == 'AnyCPU' or '$(Platform)' == 'Any CPU' or '$(Platform)' == 'x86'">Win32</_DotNetNativePlatform>
+    <_DotNetNativePlatform Condition="'$(_DotNetNativePlatform)' == ''">$(Platform)</_DotNetNativePlatform>
+    <_DotNetNativeVcpkgRoot>$(MSBuildProjectDirectory)\vcpkg_installed\x86-windows-static</_DotNetNativeVcpkgRoot>
+    <_DotNetNativeTripletRoot>$(_DotNetNativeVcpkgRoot)\x86-windows-static</_DotNetNativeTripletRoot>
+    <_DotNetNativeIncludeDir>$(_DotNetNativeTripletRoot)\include</_DotNetNativeIncludeDir>
+    <_DotNetNativeLibraryDir Condition="'$(Configuration)' == 'Debug'">$(_DotNetNativeTripletRoot)\debug\lib</_DotNetNativeLibraryDir>
+    <_DotNetNativeLibraryDir Condition="'$(Configuration)' != 'Debug'">$(_DotNetNativeTripletRoot)\lib</_DotNetNativeLibraryDir>
+    <_DotNetNativeIntermediateDir Condition="'$(Configuration)' == 'Debug'">$(MSBuildProjectDirectory)\bin\Win32\$(Configuration)</_DotNetNativeIntermediateDir>
+    <_DotNetNativeIntermediateDir Condition="'$(Configuration)' != 'Debug'">$(MSBuildProjectDirectory)\bin\$(Configuration)</_DotNetNativeIntermediateDir>
+    <_DotNetNativeOutputDir Condition="'$(Configuration)' == 'Debug'">$(MSBuildProjectDirectory)\dist\Win32\$(Configuration)</_DotNetNativeOutputDir>
+    <_DotNetNativeOutputDir Condition="'$(Configuration)' != 'Debug'">$(MSBuildProjectDirectory)\dist\$(Configuration)</_DotNetNativeOutputDir>
+    <_DotNetNativeVsWhere>$([System.Environment]::GetEnvironmentVariable('ProgramFiles(x86)'))\Microsoft Visual Studio\Installer\vswhere.exe</_DotNetNativeVsWhere>
+  </PropertyGroup>
+
+  <Target Name="_DotNetNativeFindTools">
+    <Error Condition="'$(_DotNetNativePlatform)' != 'Win32'" Text="AgeLib.Library currently supports only the Win32/x86 platform." />
+    <Exec Command="&quot;$(_DotNetNativeVsWhere)&quot; -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath" ConsoleToMSBuild="true" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_DotNetNativeVsInstallDir" />
+    </Exec>
+    <Error Condition="'$(_DotNetNativeVsInstallDir)' == ''" Text="AgeLib.Library requires the Visual C++ x86 build tools. Install the C++ desktop development workload." />
+    <Error Condition="!Exists('$(_DotNetNativeVsInstallDir)\VC\Auxiliary\Build\vcvarsall.bat')" Text="The Visual C++ environment setup script was not found in '$(_DotNetNativeVsInstallDir)'." />
+    <PropertyGroup>
+      <_DotNetNativeVcpkgExe Condition="Exists('$(VCPKG_ROOT)\vcpkg.exe')">$(VCPKG_ROOT)\vcpkg.exe</_DotNetNativeVcpkgExe>
+      <_DotNetNativeVcpkgExe Condition="'$(_DotNetNativeVcpkgExe)' == ''">$(_DotNetNativeVsInstallDir)\VC\vcpkg\vcpkg.exe</_DotNetNativeVcpkgExe>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_DotNetNativeVcpkgExe)')" Text="vcpkg.exe was not found. Install vcpkg with the Visual C++ build tools or set VCPKG_ROOT." />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\..\AgeLib.Engine\obj\$(Configuration)\net10.0\ref\AgeLib.Engine.dll')" Text="AgeLib.Engine must be built before AgeLib.Library." />
+    <Error Condition="!Exists('$(MSBuildProjectDirectory)\..\AgeLib.Common\obj\$(Configuration)\net10.0\ref\AgeLib.Common.dll')" Text="AgeLib.Common must be built before AgeLib.Library." />
+  </Target>
+
+  <Target Name="_DotNetNativeRestoreVcpkg" DependsOnTargets="_DotNetNativeFindTools">
+    <Exec Condition="!Exists('$(_DotNetNativeLibraryDir)\detours.lib')" Command="&quot;$(_DotNetNativeVcpkgExe)&quot; install --triplet=x86-windows-static --x-manifest-root=&quot;$(MSBuildProjectDirectory)&quot; --x-install-root=&quot;$(_DotNetNativeVcpkgRoot)&quot;" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Error Condition="!Exists('$(_DotNetNativeLibraryDir)\detours.lib')" Text="The vcpkg manifest did not produce detours.lib for x86-windows-static." />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="ResolveReferences;_DotNetNativeRestoreVcpkg">
+    <ItemGroup>
+      <_DotNetNativeCompileReference Include="@(ReferencePath)" Condition="'%(Filename)' == 'AgeLib.Engine' or '%(Filename)' == 'AgeLib.Common' or $([System.String]::Copy('%(FullPath)').Contains('Microsoft.NETCore.App.Ref'))" />
+      <_DotNetNativeRuntimeAssembly Include="@(_DotNetNativeCompileReference)" Condition="'%(Filename)' == 'System.Runtime'" />
+      <_DotNetNativeHostLibrary Include="$(NuGetPackageRoot)microsoft.netcore.app.host.win-x86\*\runtimes\win-x86\native\ijwhost.lib" />
+    </ItemGroup>
+    <Error Condition="'@(_DotNetNativeRuntimeAssembly)' == ''" Text="The .NET reference assemblies for $(TargetFramework) were not resolved by dotnet build." />
+    <Error Condition="'@(_DotNetNativeHostLibrary)' == ''" Text="The Microsoft.NETCore.App.Host.win-x86 package was not restored for $(TargetFramework)." />
+    <MakeDir Directories="$(_DotNetNativeIntermediateDir);$(_DotNetNativeOutputDir)" />
+    <ItemGroup>
+      <_DotNetNativeCompileArgument Include="/nologo /c /clr:netcore /std:c++17 /EHa /MDd /W3 /Zi /Od /DWIN32 /D_DEBUG /D_WINDLL /D_UNICODE /DUNICODE" Condition="'$(Configuration)' == 'Debug'" />
+      <_DotNetNativeCompileArgument Include="/nologo /c /clr:netcore /std:c++17 /EHa /MD /W3 /O2 /DWIN32 /DNDEBUG /D_WINDLL /D_UNICODE /DUNICODE" Condition="'$(Configuration)' != 'Debug'" />
+      <_DotNetNativeCompileArgument Include="/I&quot;$(_DotNetNativeIncludeDir)&quot;" />
+      <_DotNetNativeCompileArgument Include="@(_DotNetNativeRuntimeAssembly-&gt;'/AI&quot;%(RootDir)%(Directory).&quot;')" />
+      <_DotNetNativeCompileArgument Include="/Fo&quot;$(_DotNetNativeIntermediateDir)\dllmain.obj&quot;" />
+      <_DotNetNativeCompileArgument Include="/Fd&quot;$(_DotNetNativeIntermediateDir)\AgeLib.Library.pdb&quot;" />
+      <_DotNetNativeCompileArgument Include="@(_DotNetNativeCompileReference-&gt;'/FU&quot;%(FullPath)&quot;')" />
+      <_DotNetNativeCompileArgument Include="/analyze- /FC /clr:nostdlib" />
+      <_DotNetNativeCompileArgument Include="&quot;$(MSBuildProjectDirectory)\dllmain.cpp&quot;" />
+      <_DotNetNativeLinkArgument Include="/OUT:&quot;$(_DotNetNativeOutputDir)\AgeLib.Library.dll&quot;" />
+      <_DotNetNativeLinkArgument Include="/MANIFEST" />
+      <_DotNetNativeLinkArgument Include="/MANIFESTUAC:&quot;level='asInvoker' uiAccess='false'&quot;" />
+      <_DotNetNativeLinkArgument Include="/manifest:embed /DEBUG:FULL /ASSEMBLYDEBUG /DYNAMICBASE /MACHINE:X86 /DLL" />
+      <_DotNetNativeLinkArgument Include="/PDB:&quot;$(_DotNetNativeOutputDir)\AgeLib.Library.pdb&quot;" />
+      <_DotNetNativeLinkArgument Include="/LIBPATH:&quot;$(_DotNetNativeLibraryDir)&quot;" />
+      <_DotNetNativeLinkArgument Include="@(_DotNetNativeHostLibrary-&gt;'/LIBPATH:&quot;%(RootDir)%(Directory).&quot;')" />
+      <_DotNetNativeLinkArgument Include="/DEFAULTLIB:detours.lib" />
+      <_DotNetNativeLinkArgument Include="&quot;$(_DotNetNativeIntermediateDir)\dllmain.obj&quot;" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(_DotNetNativeIntermediateDir)\AgeLib.Library.dotnet-cl.rsp" Overwrite="true" Encoding="Unicode" Lines="@(_DotNetNativeCompileArgument)" />
+    <WriteLinesToFile File="$(_DotNetNativeIntermediateDir)\AgeLib.Library.dotnet-link.rsp" Overwrite="true" Encoding="Unicode" Lines="@(_DotNetNativeLinkArgument)" />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="call &quot;$(_DotNetNativeVsInstallDir)\VC\Auxiliary\Build\vcvarsall.bat&quot; x86 &gt;nul &amp;&amp; cl.exe @&quot;$(_DotNetNativeIntermediateDir)\AgeLib.Library.dotnet-cl.rsp&quot; &amp;&amp; link.exe @&quot;$(_DotNetNativeIntermediateDir)\AgeLib.Library.dotnet-link.rsp&quot;" />
+  </Target>
+</Project>
